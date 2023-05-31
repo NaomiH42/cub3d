@@ -1,7 +1,4 @@
-#include <math.h>
-#include <stdio.h>
-#include "libft/libft.h"
-#include "MLX42//include/MLX42/MLX42.h"
+#include "cub3d.h"
 
 typedef struct	m_prog
 {
@@ -47,7 +44,7 @@ void	hooks(mlx_key_data_t key, void *parameter)
 	}
 }
 
-void draw_line(void *mlx, mlx_image_t *image, int beginX, int beginY, int endX, int endY, int color)
+void draw_line(mlx_image_t *image, int beginX, int beginY, int endX, int endY, int color)
 {
 	double	deltaX;
 	double	deltaY;
@@ -71,7 +68,7 @@ void draw_line(void *mlx, mlx_image_t *image, int beginX, int beginY, int endX, 
 	}
 }
 
-int	rayCasting(t_prog prog, char map[7][10], mlx_image_t *test)
+void	rayCasting(t_prog prog, char map[7][10], mlx_image_t *test)
 {
 	double		rayAngle;
 	int		rayCount;
@@ -111,9 +108,9 @@ int	rayCasting(t_prog prog, char map[7][10], mlx_image_t *test)
 		distance = sqrt(pow(prog.player_x - ray.x, 2) + pow(prog.player_y - ray.y, 2));
 		wallHeight = (int)(prog.half_screen_h / distance);
 		// printf("%d\n", wallHeight);
-		draw_line(prog.win, test, rayCount, 0, rayCount, prog.half_screen_h - wallHeight, 0xFFFFFF);
-		draw_line(prog.win, test, rayCount, prog.half_screen_h - wallHeight, rayCount, prog.half_screen_h + wallHeight, 0x00FFFF);
-		draw_line(prog.win, test, rayCount, prog.half_screen_h + wallHeight, rayCount, prog.screen_h, 0xFF00FF);
+		draw_line(test, rayCount, 0, rayCount, prog.half_screen_h - wallHeight, 0xFFFFFF);
+		draw_line(test, rayCount, prog.half_screen_h - wallHeight, rayCount, prog.half_screen_h + wallHeight, 0x00FFFF);
+		draw_line(test, rayCount, prog.half_screen_h + wallHeight, rayCount, prog.screen_h, 0xFF00FF);
 		rayAngle += prog.increm_angle;
 		rayCount++;
 	}

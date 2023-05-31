@@ -1,11 +1,21 @@
-Name = cub3d
+NAME = cub3d
 
-srcs = main.c
+SRCS = main.c
 
-OBJ = $(patsubst %.c, %.o, $(SOURCES))
+CC = cc
 
-%.o: %.c
-	$(CC) -Wall -Wextra -Werror -I/usr/include -Imlx_linux -O3 -c $< -o $@
+CFLAGS = -Wall -Werror -Wextra
 
-$(NAME): $(OBJ)
-	$(CC) $(OBJ) -Lmlx_linux -lmlx_Linux -L/usr/lib -IMLX42 -lXext -lX11 -lm -lz -o $(NAME)
+all: $(NAME)
+
+$(NAME): $(SRCS)
+	$(CC) $(CFLAGS) $(SRCS) libmlx42.a libft.a -Iinclude -ldl -lglfw -pthread -lm -o $(NAME)
+
+clean:
+	rm -rf ${NAME}
+
+fclean:	clean
+
+re:	fclean all
+
+.PHONY:	all clean fclean re
