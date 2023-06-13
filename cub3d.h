@@ -25,8 +25,6 @@ typedef struct s_coor
 typedef struct s_map
 {
 	t_coor	pcoor;
-	t_coor	ecoor;
-	t_coor	encoor;
 	char	**layout;
 	char	**layouttest;
 	char	*no_t;
@@ -43,28 +41,45 @@ typedef struct s_map
 
 typedef struct	m_prog
 {
-	void	*win;
-	int		screen_w;
-	int		screen_h;
-	int		half_screen_w;
-	int		half_screen_h;
-	float		player_x;
-	float		player_y;
-	int		player_angle;
-	int	ray_precision;
-	int		w_cen;
-	int		h_cen;
-	int		fov;
-	int		dist_proj;
-	int		angle_rays;
-	int		sqr_size;
-	double		increm_angle;
-	mlx_image_t *test;
-	int		turn_r;
-	int		turn_l;
-	int		go_f;
-	int		go_b;
+	void		*win;
+	int			screen_w;
+	int			screen_h;
+	double		player_x;
+	double		player_y;
+	double		move_speed;
+	double		rotate_speed;
+	double		dir_vec_x;
+	double		dir_vec_y;
+	double		plane_x;
+	double		plane_y;
+	double		time;
+	double		old_time;
+	mlx_image_t *test;;
+	t_map		map;
+	mlx_texture_t *nw;
+	mlx_texture_t *sw;
+	mlx_texture_t *ew;
+	mlx_texture_t *ww;
 }				t_prog;
+
+typedef struct	m_cast_info
+{
+	double	camera;
+	int		map_x;
+	int		map_y;
+	double	side_dist_x;
+	double	side_dist_y;
+	double	dist_move_x;
+	double	dist_move_y;
+	double	wall_dist;
+	int		step_x;
+	int		step_y;
+	int		wall_no_wall;
+	int		side;
+	int		line_height;
+	int		draw_start;
+	int		draw_end;
+}				t_cast_info;
 
 t_map	get_map_info(char *map_file, t_prog *prog);
 

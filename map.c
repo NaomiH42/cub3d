@@ -6,7 +6,7 @@
 /*   By: ehasalu <ehasalu@student.42prague.com>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/14 15:40:29 by ehasalu           #+#    #+#             */
-/*   Updated: 2023/05/31 15:49:57 by ehasalu          ###   ########.fr       */
+/*   Updated: 2023/06/03 00:57:43 by ehasalu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,29 +72,52 @@ void	check_map_req(char **layout, t_map *map, t_prog *prog)
 	int	l;
 
 	i = 0;
-	l = 0;
 	while (layout[i])
 	{
+		l = 0;
 		while (layout[i][l])
 		{
+			printf("%c", layout[i][l]);
 			if (layout[i][l] == 'N' || layout[i][l] == 'S' || layout[i][l] == 'E' || layout[i][l] == 'W')
 			{
-				prog->player_y = i;
-				prog->player_x = l;
-				if (layout[i][l] == 'N')
-					prog->player_angle = -60;
+				prog->player_y = l;
+				prog->player_x = i;
 				if (layout[i][l] == 'S')
-					prog->player_angle = 100;
-				if (layout[i][l] == 'E')
-					prog->player_angle = 30;
+				{
+					prog->dir_vec_x = 0.996673; //s
+					prog->dir_vec_y = 0.081502;
+					prog->plane_x = 0.053791;
+					prog->plane_y = -0.657804;
+				}
+				if (layout[i][l] == 'N')
+				{
+					prog->dir_vec_x = -1; //n
+					prog->dir_vec_y = 0;
+					prog->plane_x = 0;
+					prog->plane_y = 0.66;
+				}
 				if (layout[i][l] == 'W')
-					prog->player_angle = 100;
+				{
+					prog->dir_vec_x = 0.108987; //w
+					prog->dir_vec_y = -0.994043;
+					prog->plane_x = -0.656068;
+					prog->plane_y = -0.071931;
+				}
+				if (layout[i][l] == 'E')
+				{
+					prog->dir_vec_x = -0.100626; //e
+					prog->dir_vec_y = 0.994924;
+					prog->plane_x = 0.656650;
+					prog->plane_y = 0.066413;
+				}
 			}
-
 			l++;
 		}
+		printf("\n");
 		i++;
 	}
+		printf("%f\n%f\n%f\n%f\n", prog->player_x, prog->player_y, prog->dir_vec_x, prog->dir_vec_y);
+
 	// while (layout[i])
 	// {
 	// 	l = 0;
