@@ -169,10 +169,10 @@ void	ray_casting2(t_prog *prog)//, int map [24][24], mlx_image_t *test)
 			info.wall_dist = info.side_dist_x - info.dist_move_x;
 		else
 			info.wall_dist = info.side_dist_y - info.dist_move_y;
-		// if (info.side == 0 && prog->player_x > info.map_x)
-		// 	info.side = 2;
-		// if (info.side == 1 && prog->player_y > info.map_y)
-		// 	info.side = 3;
+		if (info.side == 0 && prog->player_x > info.map_x)
+			info.side = 2;
+		if (info.side == 1 && prog->player_y > info.map_y)
+			info.side = 3;
 		info.line_height = (int)(prog->screen_h / info.wall_dist);
 		info.draw_start = -info.line_height / 2 + prog->screen_h / 2;
 		if (info.draw_start < 0)
@@ -181,39 +181,39 @@ void	ray_casting2(t_prog *prog)//, int map [24][24], mlx_image_t *test)
 		if (info.draw_end >= prog->screen_h)
 			info.draw_end = prog->screen_h - 1;
 
-		char tex_num = prog->map.layout[info.map_x][info.map_y];
+		// char tex_num = prog->map.layout[info.map_x][info.map_y];
 
-		double wall_x;
-		if (info.side == 0)
-			wall_x = prog->player_x + info.wall_dist * ray.y;
-		else
-			wall_x = prog->player_y + info.wall_dist * ray.x;
-		wall_x -= floor(wall_x);
-		int tex_x = (int)(wall_x * (double)64);
-		if (info.side == 0 && prog->dir_vec_x > 0)
-			tex_x = 64 - tex_x - 1;
-		if (info.side == 1 && prog->dir_vec_y < 0)
-			tex_x = 64 - tex_x - 1;
-		double step = 1.0 * 64 / info.line_height;
-		double tex_pos = (info.draw_start - prog->screen_h / 2 + info.line_height / 2) * step;
-		for (int y = 0; y < info.draw_end; y++)
-		{
-			int tex_y = (int)tex_pos & (64 - 1);
-			tex_pos += step;
-			mlx_image_t *aaa = mlx_texture_to_image(prog->win, prog->nw);
-			mlx_put_pixel(prog->test, ray_count, y, put_pixel_color(aaa, tex_x, tex_y));
-		}
-		// mlx_texture_to_image(prog->win, prog->nw);
-		// draw_line(prog->test, ray_count, 0, ray_count, info.draw_start, 0xFFFFFF);
-		// if (info.side == 1)
-		// 	draw_line(prog->test, ray_count, info.draw_start,  ray_count, info.draw_end, 0x9900FFFF);
-		// else if (info.side == 2)
-		// 	draw_line(prog->test, ray_count, info.draw_start,  ray_count, info.draw_end, 0x9999FFFF);
-		// else if (info.side == 0)
-		// 	draw_line(prog->test, ray_count, info.draw_start,  ray_count, info.draw_end, 0x0099FFFF);
+		// double wall_x;
+		// if (info.side == 0)
+		// 	wall_x = prog->player_x + info.wall_dist * ray.y;
 		// else
-		// 	draw_line(prog->test, ray_count, info.draw_start,  ray_count, info.draw_end, 0x999999FF);
-		// draw_line(prog->test, ray_count, info.draw_end, ray_count, prog->screen_h, 0xFF00FF);
+		// 	wall_x = prog->player_y + info.wall_dist * ray.x;
+		// wall_x -= floor(wall_x);
+		// int tex_x = (int)(wall_x * (double)64);
+		// if (info.side == 0 && prog->dir_vec_x > 0)
+		// 	tex_x = 64 - tex_x - 1;
+		// if (info.side == 1 && prog->dir_vec_y < 0)
+		// 	tex_x = 64 - tex_x - 1;
+		// double step = 1.0 * 64 / info.line_height;
+		// double tex_pos = (info.draw_start - prog->screen_h / 2 + info.line_height / 2) * step;
+		// for (int y = 0; y < info.draw_end; y++)
+		// {
+		// 	int tex_y = (int)tex_pos & (64 - 1);
+		// 	tex_pos += step;
+		// 	mlx_image_t *aaa = mlx_texture_to_image(prog->win, prog->nw);
+		// 	mlx_put_pixel(prog->test, ray_count, y, put_pixel_color(aaa, tex_x, tex_y));
+		// }
+		// mlx_texture_to_image(prog->win, prog->nw);
+		draw_line(prog->test, ray_count, 0, ray_count, info.draw_start, 0xFFFFFF);
+		if (info.side == 1)
+			draw_line(prog->test, ray_count, info.draw_start,  ray_count, info.draw_end, 0x9900FFFF);
+		else if (info.side == 2)
+			draw_line(prog->test, ray_count, info.draw_start,  ray_count, info.draw_end, 0x9999FFFF);
+		else if (info.side == 0)
+			draw_line(prog->test, ray_count, info.draw_start,  ray_count, info.draw_end, 0x0099FFFF);
+		else
+			draw_line(prog->test, ray_count, info.draw_start,  ray_count, info.draw_end, 0x999999FF);
+		draw_line(prog->test, ray_count, info.draw_end, ray_count, prog->screen_h, 0xFF00FF);
 
 		ray_count++;
 	}
