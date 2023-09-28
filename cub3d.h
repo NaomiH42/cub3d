@@ -7,6 +7,7 @@
 # include "MLX42//include/MLX42/MLX42.h"
 # include <stdlib.h>
 # include <fcntl.h>
+# include <string.h>
 
 # define NO 1
 # define SO 2
@@ -56,10 +57,10 @@ typedef struct	m_prog
 	double		old_time;
 	mlx_image_t *test;;
 	t_map		map;
-	mlx_texture_t *nw;
-	mlx_texture_t *sw;
-	mlx_texture_t *ew;
-	mlx_texture_t *ww;
+	mlx_image_t	 *nw;
+	mlx_image_t *sw;
+	mlx_image_t *ew;
+	mlx_image_t *ww;
 }				t_prog;
 
 typedef struct	m_cast_info

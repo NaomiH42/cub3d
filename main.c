@@ -28,6 +28,30 @@ void	hook(void *parameter)
 		if (prog->map.layout[(int)prog->player_x][(int)(prog->player_y + prog->dir_vec_y * prog->move_speed)] == '0')
 			prog->player_y += prog->dir_vec_y * prog->move_speed / 10;
 	}
+	if (mlx_is_key_down(prog->win, MLX_KEY_D))
+	{
+		double x;
+		double y;
+		if (prog->dir_vec_x < 0)
+			x = prog->dir_vec_x * -1;
+		else 
+			x = prog->dir_vec_x;
+		if (prog->dir_vec_y < 0)
+			y = prog->dir_vec_y * -1;
+		else
+			y = prog->dir_vec_y;
+		if (prog->map.layout[(int)(prog->player_x + prog->dir_vec_x * prog->move_speed)][(int)prog->player_y] == '0')
+			prog->player_x -= y * prog->move_speed / 10;
+		if (prog->map.layout[(int)prog->player_x][(int)(prog->player_y + prog->dir_vec_y * prog->move_speed)] == '0')
+			prog->player_y -= x * prog->move_speed / 10;
+	}
+	if (mlx_is_key_down(prog->win, MLX_KEY_A))
+	{
+		if (prog->map.layout[(int)(prog->player_x + prog->dir_vec_x * prog->move_speed)][(int)prog->player_y] == '0')
+			prog->player_x += prog->dir_vec_y * prog->move_speed / 10;
+		if (prog->map.layout[(int)prog->player_x][(int)(prog->player_y + prog->dir_vec_y * prog->move_speed)] == '0')
+			prog->player_y += prog->dir_vec_x * prog->move_speed / 10;
+	}
 	if (mlx_is_key_down(prog->win, MLX_KEY_S))
 	{
 		if (prog->map.layout[(int)(prog->player_x - prog->dir_vec_x * prog->move_speed)][(int)prog->player_y] == '0')
@@ -35,7 +59,7 @@ void	hook(void *parameter)
 		if (prog->map.layout[(int)prog->player_x][(int)(prog->player_y - prog->dir_vec_y * prog->move_speed)] == '0')
 			prog->player_y -= prog->dir_vec_y * prog->move_speed / 10;
 	}
-	if (mlx_is_key_down(prog->win, MLX_KEY_D))
+	if (mlx_is_key_down(prog->win, MLX_KEY_RIGHT))
 	{
 		double	old_dir_x = prog->dir_vec_x;
 		prog->dir_vec_x = prog->dir_vec_x * cos(-prog->rotate_speed) - prog->dir_vec_y * sin(-prog->rotate_speed);
@@ -44,7 +68,7 @@ void	hook(void *parameter)
 		prog->plane_x = prog->plane_x * cos(-prog->rotate_speed) - prog->plane_y * sin(-prog->rotate_speed);
 		prog->plane_y = old_plane_x * sin(-prog->rotate_speed) + prog->plane_y * cos(-prog->rotate_speed);
 	}
-	if (mlx_is_key_down(prog->win, MLX_KEY_A))
+	if (mlx_is_key_down(prog->win, MLX_KEY_LEFT))
 	{
 		double	old_dir_x = prog->dir_vec_x;
 		prog->dir_vec_x = prog->dir_vec_x * cos(prog->rotate_speed) - prog->dir_vec_y * sin(prog->rotate_speed);
@@ -102,7 +126,6 @@ void	ray_casting2(t_prog *prog)//, int map [24][24], mlx_image_t *test)
 	int	ray_count;
 	t_cast_info	info;
 	t_ray	ray;
-
 	ray_count = 0;
 	while (ray_count < prog->screen_w)
 	{
@@ -181,38 +204,35 @@ void	ray_casting2(t_prog *prog)//, int map [24][24], mlx_image_t *test)
 		if (info.draw_end >= prog->screen_h)
 			info.draw_end = prog->screen_h - 1;
 
-		// char tex_num = prog->map.layout[info.map_x][info.map_y];
-
-		// double wall_x;
-		// if (info.side == 0)
-		// 	wall_x = prog->player_x + info.wall_dist * ray.y;
-		// else
-		// 	wall_x = prog->player_y + info.wall_dist * ray.x;
-		// wall_x -= floor(wall_x);
-		// int tex_x = (int)(wall_x * (double)64);
-		// if (info.side == 0 && prog->dir_vec_x > 0)
-		// 	tex_x = 64 - tex_x - 1;
-		// if (info.side == 1 && prog->dir_vec_y < 0)
-		// 	tex_x = 64 - tex_x - 1;
-		// double step = 1.0 * 64 / info.line_height;
-		// double tex_pos = (info.draw_start - prog->screen_h / 2 + info.line_height / 2) * step;
-		// for (int y = 0; y < info.draw_end; y++)
-		// {
-		// 	int tex_y = (int)tex_pos & (64 - 1);
-		// 	tex_pos += step;
-		// 	mlx_image_t *aaa = mlx_texture_to_image(prog->win, prog->nw);
-		// 	mlx_put_pixel(prog->test, ray_count, y, put_pixel_color(aaa, tex_x, tex_y));
-		// }
-		// mlx_texture_to_image(prog->win, prog->nw);
-		draw_line(prog->test, ray_count, 0, ray_count, info.draw_start, 0xFFFFFF);
-		if (info.side == 1)
-			draw_line(prog->test, ray_count, info.draw_start,  ray_count, info.draw_end, 0x9900FFFF);
-		else if (info.side == 2)
-			draw_line(prog->test, ray_count, info.draw_start,  ray_count, info.draw_end, 0x9999FFFF);
-		else if (info.side == 0)
-			draw_line(prog->test, ray_count, info.draw_start,  ray_count, info.draw_end, 0x0099FFFF);
+		double wall_x;
+		if (info.side == 0)
+			wall_x = prog->player_y + info.wall_dist * ray.y;
 		else
-			draw_line(prog->test, ray_count, info.draw_start,  ray_count, info.draw_end, 0x999999FF);
+			wall_x = prog->player_x + info.wall_dist * ray.x;
+		wall_x -= floor(wall_x);
+		int tex_x = (int)(wall_x * (double)64);
+		if (info.side == 0 && prog->dir_vec_x > 0)
+			tex_x = 64 - tex_x - 1;
+		if (info.side == 1 && prog->dir_vec_y < 0)
+			tex_x = 64 - tex_x - 1;
+		double step = 1.0 * 64 / info.line_height;
+		double tex_pos = (info.draw_start - prog->screen_h / 2 + info.line_height / 2) * step;
+		for (int y = info.draw_start; y < info.draw_end; y++)
+		{
+			int tex_y = (int)tex_pos & (64 - 1);
+			tex_pos += step;
+			uint32_t tex_col;
+			if (info.side == 1)
+				tex_col = put_pixel_color(prog->ew, tex_x, tex_y);
+			else if (info.side == 2)
+				tex_col = put_pixel_color(prog->nw, tex_x, tex_y);
+			else if (info.side == 0)
+				tex_col = put_pixel_color(prog->sw, tex_x, tex_y);
+			else
+				tex_col = put_pixel_color(prog->ww, tex_x, tex_y);
+			mlx_put_pixel(prog->test, ray_count, y, tex_col);
+		}
+		draw_line(prog->test, ray_count, 0, ray_count, info.draw_start, 0xFFFFFF);
 		draw_line(prog->test, ray_count, info.draw_end, ray_count, prog->screen_h, 0xFF00FF);
 
 		ray_count++;
@@ -257,9 +277,7 @@ int	main(void)
 	prog.win = mlx_init(prog.screen_w, prog.screen_h, "Test", 1);
 	prog.test = mlx_new_image(prog.win, 640, 480);
 	mlx_image_to_window(prog.win, prog.test, 0, 0);
-	prog.nw = mlx_load_png("./pics/bluestone.png");
 	printf("%f\n%f\n%f\n%f\n", prog.player_x, prog.player_y, prog.dir_vec_x, prog.dir_vec_y);
-	// printf("NO:%s\nSO:%s\nWE:%s\nEA:%s\nF:%d, %d, %d\nC:%d, %d, %d\n", prog.map.no_t, prog.map.so_t, prog.map.we_t, prog.map.ea_t, prog.map.FR, prog.map.FG, prog.map.FB, prog.map.CR, prog.map.CG, prog.map.CB);
 	int i = 0;
 	int j;
 	while (prog.map.layout[i])
@@ -273,7 +291,14 @@ int	main(void)
 		printf("\n");
 		i++;
 	}
-	prog.nw = mlx_load_png("./pics/greystone.png");
+	mlx_texture_t *nw = mlx_load_png("./pics/greystone.png");
+	mlx_texture_t *sw = mlx_load_png("./pics/redbrick.png");
+	mlx_texture_t *ew = mlx_load_png("./pics/pillar.png");
+	mlx_texture_t *ww = mlx_load_png("./pics/eagle.png");
+	prog.nw = mlx_texture_to_image(prog.win, nw);
+	prog.sw = mlx_texture_to_image(prog.win, sw);
+	prog.ew = mlx_texture_to_image(prog.win, ew);
+	prog.ww = mlx_texture_to_image(prog.win, ww);
 	mlx_loop_hook(prog.win, hook, &prog);
 	mlx_key_hook(prog.win, hooks, &prog);
 	mlx_loop_hook(prog.win, frame_creator, &prog);
