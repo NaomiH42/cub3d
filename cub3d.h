@@ -61,6 +61,11 @@ typedef struct	m_prog
 	mlx_image_t *sw;
 	mlx_image_t *ew;
 	mlx_image_t *ww;
+	mlx_image_t *mini;
+	int			mini_x;
+	int			mini_y;
+	int			mini_width;
+	int			mini_height;
 }				t_prog;
 
 typedef struct	m_cast_info

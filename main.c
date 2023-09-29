@@ -30,20 +30,10 @@ void	hook(void *parameter)
 	}
 	if (mlx_is_key_down(prog->win, MLX_KEY_D))
 	{
-		double x;
-		double y;
-		if (prog->dir_vec_x < 0)
-			x = prog->dir_vec_x * -1;
-		else 
-			x = prog->dir_vec_x;
-		if (prog->dir_vec_y < 0)
-			y = prog->dir_vec_y * -1;
-		else
-			y = prog->dir_vec_y;
 		if (prog->map.layout[(int)(prog->player_x + prog->dir_vec_x * prog->move_speed)][(int)prog->player_y] == '0')
-			prog->player_x -= y * prog->move_speed / 10;
+			prog->player_x += prog->dir_vec_x * prog->move_speed / 10;
 		if (prog->map.layout[(int)prog->player_x][(int)(prog->player_y + prog->dir_vec_y * prog->move_speed)] == '0')
-			prog->player_y -= x * prog->move_speed / 10;
+			prog->player_y += prog->dir_vec_y * prog->move_speed / 10;
 	}
 	if (mlx_is_key_down(prog->win, MLX_KEY_A))
 	{
@@ -88,6 +78,24 @@ void	hooks(mlx_key_data_t key, void *parameter)
 		mlx_terminate(prog->win);
 
 }
+
+
+void draw_square(mlx_image_t *image, int beginX, int beginY, int endX, int endY, int color)
+{
+	int x = beginY;
+	int y = 0;
+	while (beginX < endX)
+	{
+		x = beginY;
+		while (x < endY)
+		{	
+			mlx_put_pixel(image, beginX, x, color);
+			x += 1;
+		}
+		beginX += 1 ;
+	}
+}
+
 
 void draw_line(mlx_image_t *image, int beginX, int beginY, int endX, int endY, int color)
 {
@@ -237,6 +245,12 @@ void	ray_casting2(t_prog *prog)//, int map [24][24], mlx_image_t *test)
 
 		ray_count++;
 	}
+	
+	draw_square(prog->mini, prog->mini_x * (prog->mini_width) ,(prog->mini_y) * (prog->mini_height),  (prog->mini_x * prog->mini_width) + prog->mini_width, (prog->mini_y * prog->mini_height) + prog->mini_height, 0xAAAAAAAA);
+	prog->mini_x = prog->player_y;
+	prog->mini_y = prog->player_x;
+	draw_square(prog->mini, prog->mini_x * (prog->mini_width) ,(prog->mini_y) * (prog->mini_height),  (prog->mini_x * prog->mini_width) + prog->mini_width, (prog->mini_y * prog->mini_height) + prog->mini_height, 0xFF0000AA);
+
 }
 
 // void	move_f(t_prog *prog, float *j, int worldMap[24][24])
@@ -258,9 +272,27 @@ void	frame_creator(void *param)
 {
 	t_prog *prog;
 	prog = param;
-	int i = 0;
+	static int i = 0;
 	static float j;
-	ray_casting2(prog);
+	static double old;
+	static int frame;
+	if (i == 0)
+	{
+		frame = 0;
+		i = 1;
+		old = 0;
+	}
+	double time = mlx_get_time();
+	if (time - old >= (double)1/120)
+	{
+		frame++;
+		if (frame == 120)
+			frame = 0;
+		// printf("%d\n", frame);
+		// printf("%f\n", mlx_get_time());
+		old = mlx_get_time();
+		ray_casting2(prog);
+	}
 	printf("PlaneX:%f\nPlaneY:%f\nDirX:%f\nDirY:%f\nX:%f\nY:%f\n", prog->plane_x, prog->plane_y, prog->dir_vec_x, prog->dir_vec_y, prog->player_x, prog->player_y);
 
 }
@@ -280,17 +312,76 @@ int	main(void)
 	printf("%f\n%f\n%f\n%f\n", prog.player_x, prog.player_y, prog.dir_vec_x, prog.dir_vec_y);
 	int i = 0;
 	int j;
+	int largest = 0;
 	while (prog.map.layout[i])
 	{
+		if (j > largest)
+			largest = j;
 		j = 0;
 		while (prog.map.layout[i][j])
 		{
+			if (prog.map.layout[i][j] == 'N')
+			{
+				prog.mini_x = j;
+				prog.mini_y = i;
+				prog.map.layout[i][j] = '0';
+			}
 			printf("%c", prog.map.layout[i][j]);
 			j++;
 		}
 		printf("\n");
 		i++;
 	}
+	if (i > j)
+	{	
+		prog.mini = mlx_new_image(prog.win, 200, 200);
+		prog.mini_height = 200/i;
+		prog.mini_width = 200/i;
+	}
+	else
+	{
+		prog.mini = mlx_new_image(prog.win, 200, 200);
+		prog.mini_height = 200/j;
+		prog.mini_width = 200/j;
+	}
+	printf("\n\n\n%d, %d", i, j);
+	// prog.mini_height = i;
+	// prog.mini_width = j;
+	// printf("\n\n\n%f, %f", prog.mini_height, mini_width);
+	i = 0;
+	int k = 0;
+	int d = 0;
+	// mlx_image_to_window(prog.win, prog.mini, 0, 0);
+	while (prog.map.layout[i])
+	{
+		j = 0;
+		k = 0;
+		while (prog.map.layout[i][j])
+		{
+			if (prog.map.layout[i][j] == '0') 
+			{
+				draw_square(prog.mini, k, d, k + prog.mini_width, d+prog.mini_height, 0xAAAAAAAA);
+			}
+			else if (prog.map.layout[i][j] == '1')
+				draw_square(prog.mini, k, d, k+prog.mini_width, d+prog.mini_height, 0xFFFFFFAA);
+			// else if (prog.map.layout[i][j] == 'N')
+			// 	draw_square(mini, k, d, k+prog.mini_width, d+prog.mini_height, 0xFF0000);
+			k += prog.mini_width;
+			// printf("%d %d\n", k, d);
+			// printf("%c", prog.map.layout[i][j]);
+			j++;
+		}
+		d+= prog.mini_height;
+		printf("\n");
+		i++;
+	}
+	k = 0;
+	printf("%f", prog.plane_x);
+	// while (k++ < 99)
+		// mlx_put_pixel(mini, k, 0, 0xFFAAFFAA);
+	printf("AAA%d %d\n\n\n\n", prog.mini_x, prog.mini_y);
+	// draw_square(prog.mini, prog.mini_x * (prog.mini_width) ,(prog.mini_y) * (prog.mini_height),  (prog.mini_x * prog.mini_width) + prog.mini_width, (prog.mini_y * prog.mini_height) + prog.mini_height, 0xFF0000AA);
+	mlx_image_to_window(prog.win, prog.mini, 0, 0);
 	mlx_texture_t *nw = mlx_load_png("./pics/greystone.png");
 	mlx_texture_t *sw = mlx_load_png("./pics/redbrick.png");
 	mlx_texture_t *ew = mlx_load_png("./pics/pillar.png");
