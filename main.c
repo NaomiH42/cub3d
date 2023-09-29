@@ -28,19 +28,23 @@ void	hook(void *parameter)
 		if (prog->map.layout[(int)prog->player_x][(int)(prog->player_y + prog->dir_vec_y * prog->move_speed)] == '0')
 			prog->player_y += prog->dir_vec_y * prog->move_speed / 10;
 	}
-	if (mlx_is_key_down(prog->win, MLX_KEY_D))
-	{
-		if (prog->map.layout[(int)(prog->player_x + prog->dir_vec_x * prog->move_speed)][(int)prog->player_y] == '0')
-			prog->player_x += prog->dir_vec_x * prog->move_speed / 10;
-		if (prog->map.layout[(int)prog->player_x][(int)(prog->player_y + prog->dir_vec_y * prog->move_speed)] == '0')
-			prog->player_y += prog->dir_vec_y * prog->move_speed / 10;
-	}
 	if (mlx_is_key_down(prog->win, MLX_KEY_A))
 	{
-		if (prog->map.layout[(int)(prog->player_x + prog->dir_vec_x * prog->move_speed)][(int)prog->player_y] == '0')
-			prog->player_x += prog->dir_vec_y * prog->move_speed / 10;
-		if (prog->map.layout[(int)prog->player_x][(int)(prog->player_y + prog->dir_vec_y * prog->move_speed)] == '0')
-			prog->player_y += prog->dir_vec_x * prog->move_speed / 10;
+		double x = -prog->dir_vec_y;
+		double y = prog->dir_vec_x;
+		if (prog->map.layout[(int)(prog->player_x + x * prog->move_speed)][(int)prog->player_y] == '0')
+			prog->player_x += x * prog->move_speed / 10;
+		if (prog->map.layout[(int)prog->player_x][(int)(prog->player_y + y * prog->move_speed)] == '0')
+			prog->player_y += y * prog->move_speed / 10;
+	}
+	if (mlx_is_key_down(prog->win, MLX_KEY_D))
+	{
+		double x = prog->dir_vec_y;
+		double y = -prog->dir_vec_x;
+		if (prog->map.layout[(int)(prog->player_x + x * prog->move_speed)][(int)prog->player_y] == '0')
+			prog->player_x += x * prog->move_speed / 10;
+		if (prog->map.layout[(int)prog->player_x][(int)(prog->player_y + y * prog->move_speed)] == '0')
+			prog->player_y += y * prog->move_speed / 10;
 	}
 	if (mlx_is_key_down(prog->win, MLX_KEY_S))
 	{
@@ -212,8 +216,11 @@ void	ray_casting2(t_prog *prog)//, int map [24][24], mlx_image_t *test)
 		if (info.draw_end >= prog->screen_h)
 			info.draw_end = prog->screen_h - 1;
 
+		// if (info.side == 2)
+		// 	info.wall_dist = sqrt((info.map_x - prog->player_x) * (info.map_x - prog->player_x) + (info.map_y - prog->player_y) * (info.map_y - prog->player_y));
+		
 		double wall_x;
-		if (info.side == 0)
+		if (info.side == 0 || info.side == 2)
 			wall_x = prog->player_y + info.wall_dist * ray.y;
 		else
 			wall_x = prog->player_x + info.wall_dist * ray.x;
