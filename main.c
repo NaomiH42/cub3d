@@ -110,8 +110,7 @@ void	mouse_hook(void *parameter)
 		prog->plane_x = prog->plane_x * cos(-prog->rotate_speed) - prog->plane_y * sin(-prog->rotate_speed);
 		prog->plane_y = old_plane_x * sin(-prog->rotate_speed) + prog->plane_y * cos(-prog->rotate_speed);
 	}
-	mlx_set_mouse_pos(prog->win, 320, 240);
-	
+	mlx_set_mouse_pos(prog->win, 320, 240);	
 }
 
 void	hooks(mlx_key_data_t key, void *parameter)

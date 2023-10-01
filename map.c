@@ -192,6 +192,14 @@ void	check_map_req(char **layout, t_map *map, t_prog *prog)
 					printf("%d %d %d %d %d\n\n", i, l, max_l[i], max_l[i + 1], max_l[i-1]);	
 					exit(0);
 				}
+				if (layout[i][l] == 'D')
+				{
+					if (layout[i + 1][l] != '1' || layout[i - 1][l] != '1')
+					{	
+						if (layout[i][l + 1] != '1' || layout[i][l - 1] != '1')
+							exit(0);
+					}
+				}
 			}
 			l++;
 		}
