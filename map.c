@@ -20,7 +20,7 @@ int	flood(t_map *map, int y, int x)
 	// 	(*map).coltest -= 1;
 	// if ((*map).layouttest[y][x] == 'E')
 	// 	(*map).extest -= 1;
-	if ((*map).layouttest[y][x] == 'E')
+	if ((*map).layouttest[y][x] == 'D' || (*map).layouttest[y][x] == 'E')
 	{
 		(*map).layouttest[y][x] = '1';
 		return (0);
@@ -66,11 +66,44 @@ int	check_path(t_map map)
 // 		error_msg(5);
 // }
 
+int	map_test(char **layout, int max_l[], int max_i)
+{
+	int i = 0;
+	int l;
+	while (layout[i])
+	{
+		l = 0;
+		while (layout[i][l])
+		{
+			if (layout[i][l] != '0' && layout[i][l] != 'N' && layout[i][l] != 'S'
+				&& layout[i][l] != 'E' && layout[i][l] != 'W' && layout[i][l] != 'C'
+				&& layout[i][l] != 'D' && layout[i][l] != ' ' && layout[i][l] != '1')
+			{
+				exit (0);
+			}
+			if (layout[i][l] == '0' || layout[i][l] == 'N' || layout[i][l] == 'S'
+				|| layout[i][l] == 'E' || layout[i][l] == 'W' || layout[i][l] == 'C'
+				|| layout[i][l] == 'D')
+			{
+				if (i == 0 || l == 0 || i == max_i || l == max_l[i] || l > max_l[i-1] || l > max_l[i+1])
+				{
+					printf("%d %d %d %d %d\n\n", i, l, max_l[i], max_l[i + 1], max_l[i-1]);	
+					exit(0);
+				}
+			}
+			l++;
+		}
+		i++;
+	}
+}
+
 void	check_map_req(char **layout, t_map *map, t_prog *prog)
 {
 	int	i;
 	int	l;
+	int	check;
 
+	check = 0;
 	i = 0;
 	while (layout[i])
 	{
@@ -105,19 +138,68 @@ void	check_map_req(char **layout, t_map *map, t_prog *prog)
 				}
 				if (layout[i][l] == 'E')
 				{
-					prog->dir_vec_x = -0.100626; //e
-					prog->dir_vec_y = 0.994924;
-					prog->plane_x = 0.656650;
-					prog->plane_y = 0.066413;
+					prog->dir_vec_x = 0.019202; //e
+					prog->dir_vec_y = -0.999816;
+					prog->plane_x = -0.659878;
+					prog->plane_y = -0.012674;
 				}
+				if (check == 1)
+					exit (0);
+				check++;
 			}
 			l++;
 		}
 		printf("\n");
 		i++;
 	}
+	if (check == 0)
+		exit (0);
 		printf("%f\n%f\n%f\n%f\n", prog->player_x, prog->player_y, prog->dir_vec_x, prog->dir_vec_y);
+	int	max_i = i;
+	int	max_l[i+1];
+	i = 0;
+	while (layout[i])
+	{
+		l = 0;
+		while (layout[i][l])
+		{
+			l++;
+		}
+		max_l[i] = l;
+		printf("%d\n", max_l[i]);
+		i++;
+	}
+	// map_test(layout, max_l, max_i);
+	i = 0;
+	while (layout[i])
+	{
+		l = 0;
+		while (layout[i][l])
+		{
+			if (layout[i][l] != '0' && layout[i][l] != 'N' && layout[i][l] != 'S'
+				&& layout[i][l] != 'E' && layout[i][l] != 'W' && layout[i][l] != 'C'
+				&& layout[i][l] != 'D' && layout[i][l] != ' ' && layout[i][l] != '1')
+			{
+				exit (0);
+			}
+			if (layout[i][l] != '1' && layout[i][l] != ' ')// || layout[i][l] == 'S'
+			// 	|| layout[i][l] == 'E' || layout[i][l] == 'W' || layout[i][l] == 'C'
+			// 	|| layout[i][l] == 'D')
+			{
+				if (i == 0 || l == 0 || i == max_i || l == max_l[i] - 1 || l >= max_l[i-1] - 1 || l >= max_l[i+1] - 1
+					|| layout[i + 1][l] == ' ' || layout[i - 1][l] == ' ' || layout[i][l + 1] == ' ' || layout[i][l - 1] == ' ')
+				{
+					printf("%d %d %d %d %d\n\n", i, l, max_l[i], max_l[i + 1], max_l[i-1]);	
+					exit(0);
+				}
+			}
+			l++;
+		}
+		i++;
+	}
 
+	// if (!flood(map, prog->player_x, prog->player_y))
+	// 	exit (0);
 	// while (layout[i])
 	// {
 	// 	l = 0;
@@ -167,7 +249,7 @@ char	*get_value_texture(char *line)
 	value = ft_strdup("");
 	while (line[i] != '.')
 		i++;
-	while (line[i])
+	while (line[i] && line[i] != ' ' && line[i] != '\n')
 	{
 		value = ft_charjoin(value, line[i]);
 		i++;
@@ -261,6 +343,7 @@ t_map	get_map_info(char *map_file, t_prog *prog)
 	fd = open(map_file, O_RDONLY);
 	layout = ft_strdup_gnl("");
 	line = get_next_line(fd);
+	
 	while (line != NULL && checker < 6)
 	{
 		checker += check_value(line, &map1);
@@ -273,7 +356,11 @@ t_map	get_map_info(char *map_file, t_prog *prog)
 		free(line);
 		line = get_next_line(fd);
 	}
+	if (!layout)
+		exit(0);
 	map1.layout = ft_split(layout, '\n');
+	if (!map1.layout[0])
+		exit(0);
 	map1.layouttest = ft_split(layout, '\n');
 	check_map_req(map1.layout, &map1, prog);
 	// free_chars(&layout, &line);

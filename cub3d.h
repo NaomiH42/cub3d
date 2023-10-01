@@ -16,6 +16,9 @@
 # define F 5
 # define C 6
 # define N 90
+# define u_div 1
+# define v_div 1
+# define v_move 0.0
 
 typedef struct s_coor
 {
@@ -39,6 +42,14 @@ typedef struct s_map
 	int		CG;
 	int		CB;
 }	t_map;
+
+typedef struct m_sprite
+{
+	int		x;
+	int		y;
+	mlx_image_t	*tex;
+	mlx_image_t *tex2;
+}				t_sprite;
 
 typedef struct	m_prog
 {
@@ -66,6 +77,13 @@ typedef struct	m_prog
 	int			mini_y;
 	int			mini_width;
 	int			mini_height;
+	double 		z_buffer[640];
+	t_sprite	sprites[1];
+	mlx_image_t	*door[4];
+	int			frame;
+	int			door_open;
+	int			door_x;
+	int			door_y;
 }				t_prog;
 
 typedef struct	m_cast_info

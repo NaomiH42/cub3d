@@ -9,7 +9,9 @@ CFLAGS = -Wall -Werror -Wextra
 all: $(NAME)
 
 $(NAME): $(SRCS)
-	$(CC) $(SRCS) libmlx42.a libft.a -Iinclude -ldl -lglfw -pthread -lm -o $(NAME)
+	$(CC) $(SRCS) libmlx42.a libft.a -Iinclude -ldl -lglfw -pthread -lm -g -o $(NAME)
+
+bonus: all
 
 clean:
 	rm -rf ${NAME}
