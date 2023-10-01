@@ -79,12 +79,57 @@ typedef struct	m_prog
 	int			mini_height;
 	double 		z_buffer[640];
 	t_sprite	sprites[1];
-	mlx_image_t	*door[4];
+	mlx_image_t	*door;
 	int			frame;
-	int			door_open;
 	int			door_x;
 	int			door_y;
 }				t_prog;
+
+typedef struct	m_check_info
+{
+	int	i;
+	int	l;
+	int	check;
+	int	max_i;
+	int	*max_l;
+}				t_check_info;
+
+typedef struct	m_render_info
+{
+	int	ray_count;
+	int tex_x;
+	int	i;
+	double	wall_x;
+	double	step;
+	double	tex_pos;
+	int		tex_y;
+	double	sprite_x;
+	double	sprite_y;
+	double	inv_det;
+	double	transform_x;
+	double	transform_y;
+	int		v_move_screen;
+	int		sprite_screen_x;
+	int		sprite_height;
+	int		draw_start_y;
+	int		draw_end_y;
+	int		draw_end_x;
+	int		draw_start_x;
+	int		sprite_width;
+	int		sprite;
+	int		stripe;
+	int		y;
+	int		d;
+	uint32_t	tex_col;
+}				t_render_info;
+
+typedef struct	m_main_info
+{
+	int	j;
+	int	i;
+	int	k;
+	int	d;
+}				t_main_info;
 
 typedef struct	m_cast_info
 {

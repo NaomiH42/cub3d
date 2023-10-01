@@ -81,7 +81,6 @@ void	hook(void *parameter)
 	}
 }
 
-
 void	mouse_hook(void *parameter)
 {
 	t_prog	*prog;
@@ -196,21 +195,16 @@ uint32_t put_pixel_color(mlx_image_t *img, int x, int y)
 	return (*px);
 }
 
-
-int	extract_color(unsigned char *pixel)
+void	ray_casting2(t_prog *prog)
 {
-	return (pixel[3] << 24 | pixel[2] << 16 | pixel[1] << 8 | pixel[0]);
-}
+	t_cast_info		info;
+	t_ray			ray;
+	t_render_info	f;
 
-void	ray_casting2(t_prog *prog)//, int map [24][24], mlx_image_t *test)
-{
-	int	ray_count;
-	t_cast_info	info;
-	t_ray	ray;
-	ray_count = 0;
-	while (ray_count < prog->screen_w)
+	f.ray_count = 0;
+	while (f.ray_count < prog->screen_w)
 	{
-		info.camera = 2 * ray_count / (double)prog->screen_w - 1;
+		info.camera = 2 * f.ray_count / (double)prog->screen_w - 1;
 		ray.x = prog->dir_vec_x + prog->plane_x * info.camera;
 		ray.y = prog->dir_vec_y + prog->plane_y * info.camera;
 		if (ray.x == 0)
@@ -218,13 +212,13 @@ void	ray_casting2(t_prog *prog)//, int map [24][24], mlx_image_t *test)
 		else
 			info.dist_move_x = 1 / ray.x;
 		if (info.dist_move_x < 0)
-				info.dist_move_x *= -1;
+			info.dist_move_x *= -1;
 		if (ray.y == 0)
 			info.dist_move_y = 1e30;
 		else
 			info.dist_move_y = 1 / ray.y;
 		if (info.dist_move_y < 0)
-				info.dist_move_y *= -1;
+			info.dist_move_y *= -1;
 		info.map_x = (int)prog->player_x;
 		info.map_y = (int)prog->player_y;
 		info.wall_no_wall = 0;
@@ -282,156 +276,91 @@ void	ray_casting2(t_prog *prog)//, int map [24][24], mlx_image_t *test)
 		info.draw_end = info.line_height / 2 + prog->screen_h / 2;
 		if (info.draw_end >= prog->screen_h)
 			info.draw_end = prog->screen_h - 1;
-		double wall_x;
 		if (info.side == 0 || info.side == 2)
-			wall_x = prog->player_y + info.wall_dist * ray.y;
+			f.wall_x = prog->player_y + info.wall_dist * ray.y;
 		else
-			wall_x = prog->player_x + info.wall_dist * ray.x;
-		wall_x -= floor(wall_x);
-		int tex_x = (int)(wall_x * (double)64);
+			f.wall_x = prog->player_x + info.wall_dist * ray.x;
+		f.wall_x -= floor(f.wall_x);
+		f.tex_x = (int)(f.wall_x * (double)64);
 		if (info.side == 0 && prog->dir_vec_x > 0)
-			tex_x = 64 - tex_x - 1;
+			f.tex_x = 64 - f.tex_x - 1;
 		if (info.side == 1 && prog->dir_vec_y < 0)
-			tex_x = 64 - tex_x - 1;
-		double step = 1.0 * 64 / info.line_height;
-		double tex_pos = (info.draw_start - prog->screen_h / 2 + info.line_height / 2) * step;
-		for (int y = info.draw_start; y < info.draw_end; y++)
+			f.tex_x = 64 - f.tex_x - 1;
+		f.step = 1.0 * 64 / info.line_height;
+		f.tex_pos = (info.draw_start - prog->screen_h / 2 + info.line_height / 2) * f.step;
+		f.y = info.draw_start - 1;
+		while (++f.y < info.draw_end)
 		{
-			int tex_y = (int)tex_pos & (64 - 1);
-			tex_pos += step;
-			uint32_t tex_col;
+			f.tex_y = (int)f.tex_pos & (64 - 1);
+			f.tex_pos += f.step;
 			if (info.wall_no_wall == 2)
-			{
-				tex_col = put_pixel_color(prog->door[0], tex_x, tex_y);
-			}
+				f.tex_col = put_pixel_color(prog->door, f.tex_x, f.tex_y);
 			else if (info.side == 1)
-				tex_col = put_pixel_color(prog->ew, tex_x, tex_y);
+				f.tex_col = put_pixel_color(prog->ew, f.tex_x, f.tex_y);
 			else if (info.side == 2)
-				tex_col = put_pixel_color(prog->nw, tex_x, tex_y);
+				f.tex_col = put_pixel_color(prog->nw, f.tex_x, f.tex_y);
 			else if (info.side == 0)
-				tex_col = put_pixel_color(prog->sw, tex_x, tex_y);
+				f.tex_col = put_pixel_color(prog->sw, f.tex_x, f.tex_y);
 			else
-				tex_col = put_pixel_color(prog->ww, tex_x, tex_y);
-			// if (info.wall_no_wall == 1)
-				mlx_put_pixel(prog->test, ray_count, y, tex_col);
-			// else if((tex_col & 0x00FFFFFF) != 0)
-			// 	mlx_put_pixel(prog->test, ray_count, y, tex_col);
-			
+				f.tex_col = put_pixel_color(prog->ww, f.tex_x, f.tex_y);
+			mlx_put_pixel(prog->test, f.ray_count, f.y, f.tex_col);
 		}
-		draw_line(prog->test, ray_count, 0, ray_count, info.draw_start, 0xFFFFFF);
-		draw_line(prog->test, ray_count, info.draw_end, ray_count, prog->screen_h, 0xFF00FF);
-		prog->z_buffer[ray_count] = info.wall_dist;
-		ray_count++;
+		draw_line(prog->test, f.ray_count, 0, f.ray_count, info.draw_start, 0xFFFFFF);
+		draw_line(prog->test, f.ray_count, info.draw_end, f.ray_count, prog->screen_h, 0xFF00FF);
+		prog->z_buffer[f.ray_count] = info.wall_dist;
+		f.ray_count++;
 	}
-	for (int i = 0; i < 1; i++)
+	f.i = -1;
+	while (++f.i < 1)
 	{
-		double	sprite_x = prog->sprites[0].x - prog->player_x;
-		double	sprite_y = prog->sprites[0].y - prog->player_y;
+		f.sprite_x = prog->sprites[0].x - prog->player_x;
+		f.sprite_y = prog->sprites[0].y - prog->player_y;
 
-		double inv_det = 1.0 / (prog->plane_x * prog->dir_vec_y - prog->dir_vec_x * prog->plane_y);
+		f.inv_det = 1.0 / (prog->plane_x * prog->dir_vec_y - prog->dir_vec_x * prog->plane_y);
 
-		double transform_x = inv_det * (prog->dir_vec_y * sprite_x - prog->dir_vec_x * sprite_y);
-		double transform_y = inv_det * (-prog->plane_y * sprite_x + prog->plane_x * sprite_y);
+		f.transform_x = f.inv_det * (prog->dir_vec_y * f.sprite_x - prog->dir_vec_x * f.sprite_y);
+		f.transform_y = f.inv_det * (-prog->plane_y * f.sprite_x + prog->plane_x * f.sprite_y);
 
 
-		int v_move_screen = (int)(v_move / transform_y);
+		f.v_move_screen = (int)(v_move / f.transform_y);
 
-		int sprite_screen_x = (int)((640 / 2) * (1 + transform_x / transform_y));
+		f.sprite_screen_x = (int)((640 / 2) * (1 + f.transform_x / f.transform_y));
 		
-		int sprite_height = abs((int)(480 / transform_y)) / v_div;
+		f.sprite_height = abs((int)(480 / f.transform_y)) / v_div;
 		
-		int draw_start_y = (-sprite_height / 2 + 480 / 2) + v_move_screen;
-		if (draw_start_y < 0)
-			draw_start_y = 0;
-		int draw_end_y = (sprite_height / 2 + 480 /2) + v_move_screen;
-		if (draw_end_y >= 480)
-			draw_end_y = 480 - 1;
+		f.draw_start_y = (-f.sprite_height / 2 + 480 / 2) + f.v_move_screen;
+		if (f.draw_start_y < 0)
+			f.draw_start_y = 0;
+		f.draw_end_y = (f.sprite_height / 2 + 480 /2) + f.v_move_screen;
+		if (f.draw_end_y >= 480)
+			f.draw_end_y = 480 - 1;
 
-		int sprite_width = abs((int)(480 / (transform_y))) / u_div;
+		f.sprite_width = abs((int)(480 / (f.transform_y))) / u_div;
 
-		int draw_start_x = -sprite_width / 2 + sprite_screen_x;
-		if (draw_start_x < 0)
-			draw_start_x = 0;
-		int draw_end_x = sprite_width / 2 + sprite_screen_x;
-		if (draw_end_x >= 640)
-			draw_end_x = 640 - 1;
-			
-		for (int stripe = draw_start_x; stripe < draw_end_x; stripe++)
+		f.draw_start_x = -f.sprite_width / 2 + f.sprite_screen_x;
+		if (f.draw_start_x < 0)
+			f.draw_start_x = 0;
+		f.draw_end_x = f.sprite_width / 2 + f.sprite_screen_x;
+		if (f.draw_end_x >= 640)
+			f.draw_end_x = 640 - 1;
+		f.stripe = f.draw_start_x;
+		while (++f.stripe < f.draw_end_x)
 		{
-			int tex_x = (int)((256 * (stripe - (-sprite_width / 2 + sprite_screen_x)) * 64 / sprite_width) / 256);
-			if (transform_y > 0 && stripe > 0 && stripe < 640 && transform_y < prog->z_buffer[stripe])
+			f.tex_x = (int)((256 * (f.stripe - (-f.sprite_width / 2 + f.sprite_screen_x)) * 64 / f.sprite_width) / 256);
+			if (f.transform_y > 0 && f.stripe > 0 && f.stripe < 640 && f.transform_y < prog->z_buffer[f.stripe])
 			{
-				for (int y = draw_start_y; y < draw_end_y; y++)
+				f.y = f.draw_start_y;
+				while (++f.y < f.draw_end_y)
 				{
-					int d = (y-v_move_screen) * 256 - 480 * 128 + sprite_height * 128;
-					// printf("%d\n\n", v_move_screen);s
-					int tex_y = ((d * 64) / sprite_height) / 256;
-					// printf("%d %d\n", tex_x, tex_y);
-					uint32_t tex_col = put_pixel_color(prog->sprites[0].tex, tex_x ,tex_y);
-					// uint32_t *px = (uint32_t *)(prog->sprites[0].tex->pixels + (prog->spritesimg->width * y + x) * sizeof(uint32_t));
-	
-					// printf("%d", tex_col);
-					if((tex_col & 0x00FFFFFF) != 0)
-						mlx_put_pixel(prog->test, stripe,y, tex_col);
+					f.d = (f.y-f.v_move_screen) * 256 - 480 * 128 + f.sprite_height * 128;
+					f.tex_y = ((f.d * 64) / f.sprite_height) / 256;
+					f.tex_col = put_pixel_color(prog->sprites[0].tex, f.tex_x ,f.tex_y);
+					if((f.tex_col & 0x00FFFFFF) != 0)
+						mlx_put_pixel(prog->test, f.stripe, f.y, f.tex_col);
 				}
 			}
 		}
 	}	
-	// for (int i = 0; i < 1; i++)
-	// {
-	// 	double	sprite_x = prog->door_x - prog->player_x +0.5;
-	// 	double	sprite_y = prog->door_y - prog->player_y +0.5;
-
-	// 	double inv_det = 1.0 / (prog->plane_x * prog->dir_vec_y - prog->dir_vec_x * prog->plane_y);
-
-	// 	double transform_x = inv_det * (prog->dir_vec_y * sprite_x - prog->dir_vec_x * sprite_y);
-	// 	double transform_y = inv_det * (-prog->plane_y * sprite_x + prog->plane_x * sprite_y);
-
-
-	// 	int v_move_screen = (int)(v_move / transform_y);
-
-	// 	int sprite_screen_x = (int)((640 / 2) * (1 + transform_x / transform_y));
-		
-	// 	int sprite_height = abs((int)(480 / transform_y)) / v_div;
-		
-	// 	int draw_start_y = (-sprite_height / 2 + 480 / 2) + v_move_screen;
-	// 	if (draw_start_y < 0)
-	// 		draw_start_y = 0;
-	// 	int draw_end_y = (sprite_height / 2 + 480 /2) + v_move_screen;
-	// 	if (draw_end_y >= 480)
-	// 		draw_end_y = 480 - 1;
-
-	// 	int sprite_width = abs((int)(480 / (transform_y))) / u_div;
-
-	// 	int draw_start_x = -sprite_width / 2 + sprite_screen_x;
-	// 	if (draw_start_x < 0)
-	// 		draw_start_x = 0;
-	// 	int draw_end_x = sprite_width / 2 + sprite_screen_x;
-	// 	if (draw_end_x >= 640)
-	// 		draw_end_x = 640 - 1;
-			
-	// 	for (int stripe = draw_start_x; stripe < draw_end_x; stripe++)
-	// 	{
-	// 		int tex_x = (int)((256 * (stripe - (-sprite_width / 2 + sprite_screen_x)) * 64 / sprite_width) / 256);
-	// 		if (transform_y > 0 && stripe > 0 && stripe < 640 && transform_y < prog->z_buffer[stripe])
-	// 		{
-	// 			for (int y = draw_start_y; y < draw_end_y; y++)
-	// 			{
-	// 				int d = (y-v_move_screen) * 256 - 480 * 128 + sprite_height * 128;
-	// 				// printf("%d\n\n", v_move_screen);s
-	// 				int tex_y = ((d * 64) / sprite_height) / 256;
-	// 				// printf("%d %d\n", tex_x, tex_y);
-	// 				uint32_t tex_col = put_pixel_color(prog->door[0], tex_x ,tex_y);
-	// 				// uint32_t *px = (uint32_t *)(prog->sprites[0].tex->pixels + (prog->spritesimg->width * y + x) * sizeof(uint32_t));
-	
-	// 				// printf("%d", tex_col);
-	// 				if((tex_col & 0x00FFFFFF) != 0)
-	// 					mlx_put_pixel(prog->test, stripe,y, tex_col);
-	// 			}
-	// 		}
-	// 	}
-	// }
-	
 	if (prog->map.layout[prog->mini_y][prog->mini_x] == 'O')		
 		draw_square(prog->mini, prog->mini_x * (prog->mini_width) ,(prog->mini_y) * (prog->mini_height),  (prog->mini_x * prog->mini_width) + prog->mini_width, (prog->mini_y * prog->mini_height) + prog->mini_height, 0xFFBBBBBB);
 	else
@@ -442,175 +371,168 @@ void	ray_casting2(t_prog *prog)//, int map [24][24], mlx_image_t *test)
 
 }
 
-// void	move_f(t_prog *prog, float *j, int worldMap[24][24])
-// {
-// 	if (*j == 10)
-// 	{
-// 		prog->go_f = 0;
-// 		*j = 0;
-// 		return ;
-// 	}
-// 	if (worldMap[(int)(prog->player_x + prog->dir_vec_x * prog->move_speed)][(int)prog->player_y] == 0)
-// 			prog->player_x += (prog->dir_vec_x * prog->move_speed) / 10;
-// 	if (worldMap[(int)prog->player_x][(int)(prog->player_y + prog->dir_vec_y * prog->move_speed)] == 0)
-// 			prog->player_y += (prog->dir_vec_y * prog->move_speed) / 10;
-// 	*j++;
-// }
+void	change_sprite(t_prog *prog)
+{
+	mlx_image_t	*temp;
+
+	printf("AAA");
+	temp = prog->sprites[0].tex;
+	prog->sprites[0].tex = prog->sprites[0].tex2;
+	prog->sprites[0].tex2 = temp;
+}
 
 void	frame_creator(void *param)
 {
-	t_prog *prog;
+	t_prog			*prog;
+	static int		i;
+	static float	j;
+	static double	old;
+	double			time;
+
 	prog = param;
-	static int i = 0;
-	static float j;
-	static double old;
-	static int s_frame;
 	if (i == 0)
 	{
 		prog->frame = 0;
 		i = 1;
 		old = 0;
-		s_frame = 200;
 	}
-	// printf("%d %d\n", pos_x, pos_y);
-	double time = mlx_get_time();
-	if (time - old >= (double)1/120)
+	time = mlx_get_time();
+	if (time - old >= (double)1 / 120)
 	{
-		prog->frame++;
+		prog->frame += 1;
 		if (prog->frame % 30 == 0)
-		{
-			mlx_image_t *temp;
-			temp = prog->sprites[0].tex;
-			prog->sprites[0].tex = prog->sprites[0].tex2;
-			prog->sprites[0].tex2 = temp;
-		}
-		if (prog->frame == 1)
-		{
-			int a = 0;
-			while (prog->map.layout[a])
-			{
-				// printf("%s\n", prog->map.layout[a]);
-				a++;
-			}
-		}
+			change_sprite(prog);
 		if (prog->frame == 120)
-				prog->frame = 0;
-		// printf("%d\n", prog->frame);
-		// printf("%f\n", mlx_get_time());
+			prog->frame = 0;
 		old = mlx_get_time();
 		ray_casting2(prog);
 	}
-	// printf("PlaneX:%f\nPlaneY:%f\nDirX:%f\nDirY:%f\nX:%f\nY:%f\n", prog->plane_x, prog->plane_y, prog->dir_vec_x, prog->dir_vec_y, prog->player_x, prog->player_y);
+}
+
+void prog_init(t_prog *prog)
+{
+	prog->screen_w = 640;
+	prog->screen_h = 480;
+	prog->map = get_map_info("./map.cub", prog);
+	prog->move_speed = 0.5;
+	prog->rotate_speed = 0.03;
+	prog->win = mlx_init(prog->screen_w, prog->screen_h, "Test", 1);
+	prog->test = mlx_new_image(prog->win, 640, 480);
+	mlx_image_to_window(prog->win, prog->test, 0, 0);
+}
+
+void	load_walls(t_prog *prog)
+{
+	mlx_texture_t	*nw;
+	mlx_texture_t	*sw;
+	mlx_texture_t	*ew;
+	mlx_texture_t	*ww;
+
+	nw = mlx_load_png(prog->map.no_t);
+	sw = mlx_load_png(prog->map.so_t);
+	ew = mlx_load_png(prog->map.ea_t);
+	ww = mlx_load_png(prog->map.we_t);
+	prog->nw = mlx_texture_to_image(prog->win, nw);
+	prog->sw = mlx_texture_to_image(prog->win, sw);
+	prog->ew = mlx_texture_to_image(prog->win, ew);
+	prog->ww = mlx_texture_to_image(prog->win, ww);
+}
+
+void	load_sprites(t_prog *prog)
+{
+	mlx_texture_t	*bar;
+	mlx_texture_t	*bar2;
+	mlx_texture_t	*door;
+
+	bar = mlx_load_png("./pics/cat1.png");
+	bar2 = mlx_load_png("./pics/cat2.png");
+	prog->sprites[0].tex = mlx_texture_to_image(prog->win, bar);
+	prog->sprites[0].tex2 = mlx_texture_to_image(prog->win, bar2);
+	door = mlx_load_png("./pics/door1.png");
+	prog->door = mlx_texture_to_image(prog->win, door);
+}
+
+void	prepare_map(t_prog *prog, int *i, int *j)
+{
+	*i = -1;
+	while (prog->map.layout[++(*i)])
+	{
+		*j = -1;
+		while (prog->map.layout[*i][++(*j)])
+		{
+			if (prog->map.layout[*i][*j] == 'N'
+				|| prog->map.layout[*i][*j] == 'E'
+				|| prog->map.layout[*i][*j] == 'W'
+				|| prog->map.layout[*i][*j] == 'S')
+			{
+				prog->mini_x = *j;
+				prog->mini_y = *i;
+				prog->map.layout[*i][*j] = '0';
+			}
+			if (prog->map.layout[*i][*j] == 'C')
+			{
+				prog->sprites[0].x = *i;
+				prog->sprites[0].y = *j;
+				prog->map.layout[*i][*j] = '0';
+			}
+		}
+	}
+}
+
+void	prepare_mini(t_prog *prog, int i, int j)
+{
+	if (i > j)
+	{
+		prog->mini = mlx_new_image(prog->win, 200, 200);
+		prog->mini_height = 200 / i;
+		prog->mini_width = 200 / i;
+	}
+	else
+	{
+		prog->mini = mlx_new_image(prog->win, 200, 200);
+		prog->mini_height = 200 / j;
+		prog->mini_width = 200 / j;
+	}
+}
+
+void	draw_mini(t_main_info *f, t_prog *prog)
+{
+	f->i = -1;
+	f->k = 0;
+	f->d = 0;
+	while (prog->map.layout[++f->i])
+	{
+		f->j = 0;
+		f->k = 0;
+		while (prog->map.layout[f->i][++f->j])
+		{
+			if (prog->map.layout[f->i][f->j] == '0')
+				draw_square(prog->mini, f->k, f->d, f->k
+					+ prog->mini_width, f->d + prog->mini_height, 0xAAAAAAAA);
+			else if (prog->map.layout[f->i][f->j] == '1')
+				draw_square(prog->mini, f->k, f->d, f->k
+					+ prog->mini_width, f->d + prog->mini_height, 0xFFFFFFAA);
+			else if (prog->map.layout[f->i][f->j] == 'D')
+				draw_square(prog->mini, f->k, f->d, f->k
+					+ prog->mini_width, f->d + prog->mini_height, 0xFFBBBBBB);
+			f->k += prog->mini_width;
+		}
+		f->d += prog->mini_height;
+	}
 }
 
 int	main(void)
 {
-	t_prog prog;
-	prog.screen_w = 640;
-	prog.screen_h = 480;
+	t_prog		prog;
+	t_main_info	info;
 
-	prog.map = get_map_info("./map.cub", &prog);
-	prog.move_speed = 0.5;
-	prog.rotate_speed = 0.03;
-	prog.win = mlx_init(prog.screen_w, prog.screen_h, "Test", 1);
-	prog.test = mlx_new_image(prog.win, 640, 480);
-	mlx_image_to_window(prog.win, prog.test, 0, 0);
-	printf("%f\n%f\n%f\n%f\n", prog.player_x, prog.player_y, prog.dir_vec_x, prog.dir_vec_y);
-	int i = 0;
-	int j;
-	int largest = 0;
-	prog.door_open = 0;
-	while (prog.map.layout[i])
-	{
-		if (j > largest)
-			largest = j;
-		j = 0;
-		while (prog.map.layout[i][j])
-		{
-			if (prog.map.layout[i][j] == 'N' || prog.map.layout[i][j] == 'E' 
-				|| prog.map.layout[i][j] == 'W' || prog.map.layout[i][j] == 'S' )
-			{
-				prog.mini_x = j;
-				prog.mini_y = i;
-				prog.map.layout[i][j] = '0';
-			}
-			if (prog.map.layout[i][j] == 'C')
-			{
-				prog.sprites[0].x = i;
-				prog.sprites[0].y = j;
-				prog.map.layout[i][j] = '0';				
-			}
-			printf("%c", prog.map.layout[i][j]);
-			j++;
-		}
-		printf("\n");
-		i++;
-	}
-	if (i > j)
-	{	
-		prog.mini = mlx_new_image(prog.win, 200, 200);
-		prog.mini_height = 200/i;
-		prog.mini_width = 200/i;
-	}
-	else
-	{
-		prog.mini = mlx_new_image(prog.win, 200, 200);
-		prog.mini_height = 200/j;
-		prog.mini_width = 200/j;
-	}
-	printf("\n\n\n%d, %d", i, j);
-	i = 0;
-	int k = 0;
-	int d = 0;
-	while (prog.map.layout[i])
-	{
-		j = 0;
-		k = 0;
-		while (prog.map.layout[i][j])
-		{
-			if (prog.map.layout[i][j] == '0') 
-			{
-				draw_square(prog.mini, k, d, k + prog.mini_width, d+prog.mini_height, 0xAAAAAAAA);
-			}
-			else if (prog.map.layout[i][j] == '1')
-				draw_square(prog.mini, k, d, k+prog.mini_width, d+prog.mini_height, 0xFFFFFFAA);
-			else if (prog.map.layout[i][j] == 'D')
-				draw_square(prog.mini, k, d, k+prog.mini_width, d+prog.mini_height, 0xFFBBBBBB);
-			k += prog.mini_width;
-			j++;
-		}
-		d+= prog.mini_height;
-		printf("\n");
-		i++;
-	}
-	k = 0;;
-	mlx_texture_t *bar = mlx_load_png("./pics/cat1.png");
-	mlx_texture_t *bar2 = mlx_load_png("./pics/cat2.png");
-	prog.sprites[0].tex = mlx_texture_to_image(prog.win, bar);
-	prog.sprites[0].tex2 = mlx_texture_to_image(prog.win, bar2);
-
-	mlx_texture_t *door1 = mlx_load_png("./pics/door1.png");
-	mlx_texture_t *door2 = mlx_load_png("./pics/door2.png");
-	mlx_texture_t *door3 = mlx_load_png("./pics/door3.png");
-	mlx_texture_t *door4 = mlx_load_png("./pics/door4.png");
-	prog.door[0] = mlx_texture_to_image(prog.win, door1);
-	prog.door[1] = mlx_texture_to_image(prog.win, door2);
-	prog.door[2] = mlx_texture_to_image(prog.win, door3);
-	prog.door[3] = mlx_texture_to_image(prog.win, door4);
-	printf("%f", prog.plane_x);
-	printf("AAA%d %d\n\n\n\n", prog.mini_x, prog.mini_y);
-	printf("%s", prog.map.no_t);
+	prog_init(&prog);
+	prepare_map(&prog, &info.i, &info.j);
+	prepare_mini(&prog, info.i, info.j);
+	draw_mini(&info, &prog);
+	load_sprites(&prog);
 	mlx_image_to_window(prog.win, prog.mini, 0, 0);
-	mlx_texture_t *nw = mlx_load_png(prog.map.no_t);
-	mlx_texture_t *sw = mlx_load_png(prog.map.so_t);
-	mlx_texture_t *ew = mlx_load_png(prog.map.ea_t);
-	mlx_texture_t *ww = mlx_load_png(prog.map.we_t);
-	if (!nw)
-		exit(0);
-	prog.nw = mlx_texture_to_image(prog.win, nw);
-	prog.sw = mlx_texture_to_image(prog.win, sw);
-	prog.ew = mlx_texture_to_image(prog.win, ew);
-	prog.ww = mlx_texture_to_image(prog.win, ww);
+	load_walls(&prog);
 	mlx_loop_hook(prog.win, hook, &prog);
 	mlx_key_hook(prog.win, hooks, &prog);
 	mlx_loop_hook(prog.win, frame_creator, &prog);

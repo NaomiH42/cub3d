@@ -12,32 +12,36 @@
 
 #include "cub3d.h"
 
-int	flood(t_map *map, int y, int x)
-{
-	if ((*map).layouttest[y][x] == '1' || (*map).layouttest[y][x] == 'F')
-		return (0);
-	// if ((*map).layouttest[y][x] == 'C')
-	// 	(*map).coltest -= 1;
-	// if ((*map).layouttest[y][x] == 'E')
-	// 	(*map).extest -= 1;
-	if ((*map).layouttest[y][x] == 'D' || (*map).layouttest[y][x] == 'E')
-	{
-		(*map).layouttest[y][x] = '1';
-		return (0);
-	}
-	else
-		(*map).layouttest[y][x] = 'F';
-	flood(map, y + 1, x);
-	flood(map, y - 1, x);
-	flood(map, y, x - 1);
-	flood(map, y, x + 1);
-	return (1);
-}
+// int	flood(t_map *map, int y, int x)
+// {
+// 	if ((*map).layouttest[y][x] == '1' || (*map).layouttest[y][x] == 'F')
+// 		return (0);
+// 	if ((*map).layouttest[y][x] == 'D' || (*map).layouttest[y][x] == 'E')
+// 	{
+// 		(*map).layouttest[y][x] = '1';
+// 		return (0);
+// 	}
+// 	else
+// 		(*map).layouttest[y][x] = 'F';
+// 	flood(map, y + 1, x);
+// 	flood(map, y - 1, x);
+// 	flood(map, y, x - 1);
+// 	flood(map, y, x + 1);
+// 	return (1);
+// }
 
-int	check_path(t_map map)
+// int	check_path(t_map map)
+// {
+// 	flood(&map, map.pcoor.y, map.pcoor.x);
+// 	return (1);
+// }
+
+void	error_msg(char *msg)
 {
-	flood(&map, map.pcoor.y, map.pcoor.x);
-	return (1);
+	ft_putstr_fd("Error\n", 2);
+	ft_putstr_fd(msg, 2);
+	ft_putstr_fd("\n", 2);
+	exit(0);
 }
 
 // void	check_map_lines(char **layout, t_map *map, int i, int l)
@@ -66,164 +70,147 @@ int	check_path(t_map map)
 // 		error_msg(5);
 // }
 
-int	map_test(char **layout, int max_l[], int max_i)
-{
-	int i = 0;
-	int l;
-	while (layout[i])
-	{
-		l = 0;
-		while (layout[i][l])
-		{
-			if (layout[i][l] != '0' && layout[i][l] != 'N' && layout[i][l] != 'S'
-				&& layout[i][l] != 'E' && layout[i][l] != 'W' && layout[i][l] != 'C'
-				&& layout[i][l] != 'D' && layout[i][l] != ' ' && layout[i][l] != '1')
-			{
-				exit (0);
-			}
-			if (layout[i][l] == '0' || layout[i][l] == 'N' || layout[i][l] == 'S'
-				|| layout[i][l] == 'E' || layout[i][l] == 'W' || layout[i][l] == 'C'
-				|| layout[i][l] == 'D')
-			{
-				if (i == 0 || l == 0 || i == max_i || l == max_l[i] || l > max_l[i-1] || l > max_l[i+1])
-				{
-					printf("%d %d %d %d %d\n\n", i, l, max_l[i], max_l[i + 1], max_l[i-1]);	
-					exit(0);
-				}
-			}
-			l++;
-		}
-		i++;
-	}
-}
-
-void	check_map_req(char **layout, t_map *map, t_prog *prog)
+int	map_test(char **la, int m[], int n)
 {
 	int	i;
 	int	l;
-	int	check;
 
-	check = 0;
-	i = 0;
-	while (layout[i])
+	i = -1;
+	while (la[++i])
 	{
-		l = 0;
-		while (layout[i][l])
+		l = -1;
+		while (la[i][++l])
 		{
-			printf("%c", layout[i][l]);
-			if (layout[i][l] == 'N' || layout[i][l] == 'S' || layout[i][l] == 'E' || layout[i][l] == 'W')
+			if (la[i][l] != '0' && la[i][l] != 'N' && la[i][l] != 'S'
+				&& la[i][l] != 'E' && la[i][l] != 'W' && la[i][l] != 'C'
+				&& la[i][l] != 'D' && la[i][l] != ' ' && la[i][l] != '1')
+				error_msg("Incorrect symbol found.");
+			if (la[i][l] == '0' || la[i][l] == 'N' || la[i][l] == 'S'
+				|| la[i][l] == 'E' || la[i][l] == 'W' || la[i][l] == 'C'
+				|| la[i][l] == 'D')
 			{
-				prog->player_y = l;
-				prog->player_x = i;
-				if (layout[i][l] == 'S')
-				{
-					prog->dir_vec_x = 0.996673; //s
-					prog->dir_vec_y = 0.081502;
-					prog->plane_x = 0.053791;
-					prog->plane_y = -0.657804;
-				}
-				if (layout[i][l] == 'N')
-				{
-					prog->dir_vec_x = -1; //n
-					prog->dir_vec_y = 0;
-					prog->plane_x = 0;
-					prog->plane_y = 0.66;
-				}
-				if (layout[i][l] == 'W')
-				{
-					prog->dir_vec_x = 0.108987; //w
-					prog->dir_vec_y = -0.994043;
-					prog->plane_x = -0.656068;
-					prog->plane_y = -0.071931;
-				}
-				if (layout[i][l] == 'E')
-				{
-					prog->dir_vec_x = 0.019202; //e
-					prog->dir_vec_y = -0.999816;
-					prog->plane_x = -0.659878;
-					prog->plane_y = -0.012674;
-				}
-				if (check == 1)
-					exit (0);
-				check++;
+				if (i == 0 || l == 0 || i == n || l == m[i]
+					|| l > m[i - 1] || l > m[i + 1])
+					error_msg("Not enclosed by walls.");
 			}
-			l++;
 		}
-		printf("\n");
-		i++;
 	}
-	if (check == 0)
-		exit (0);
-		printf("%f\n%f\n%f\n%f\n", prog->player_x, prog->player_y, prog->dir_vec_x, prog->dir_vec_y);
-	int	max_i = i;
-	int	max_l[i+1];
-	i = 0;
-	while (layout[i])
-	{
-		l = 0;
-		while (layout[i][l])
-		{
-			l++;
-		}
-		max_l[i] = l;
-		printf("%d\n", max_l[i]);
-		i++;
-	}
-	// map_test(layout, max_l, max_i);
-	i = 0;
-	while (layout[i])
-	{
-		l = 0;
-		while (layout[i][l])
-		{
-			if (layout[i][l] != '0' && layout[i][l] != 'N' && layout[i][l] != 'S'
-				&& layout[i][l] != 'E' && layout[i][l] != 'W' && layout[i][l] != 'C'
-				&& layout[i][l] != 'D' && layout[i][l] != ' ' && layout[i][l] != '1')
-			{
-				exit (0);
-			}
-			if (layout[i][l] != '1' && layout[i][l] != ' ')// || layout[i][l] == 'S'
-			// 	|| layout[i][l] == 'E' || layout[i][l] == 'W' || layout[i][l] == 'C'
-			// 	|| layout[i][l] == 'D')
-			{
-				if (i == 0 || l == 0 || i == max_i || l == max_l[i] - 1 || l >= max_l[i-1] - 1 || l >= max_l[i+1] - 1
-					|| layout[i + 1][l] == ' ' || layout[i - 1][l] == ' ' || layout[i][l + 1] == ' ' || layout[i][l - 1] == ' ')
-				{
-					printf("%d %d %d %d %d\n\n", i, l, max_l[i], max_l[i + 1], max_l[i-1]);	
-					exit(0);
-				}
-				if (layout[i][l] == 'D')
-				{
-					if (layout[i + 1][l] != '1' || layout[i - 1][l] != '1')
-					{	
-						if (layout[i][l + 1] != '1' || layout[i][l - 1] != '1')
-							exit(0);
-					}
-				}
-			}
-			l++;
-		}
-		i++;
-	}
+}
 
-	// if (!flood(map, prog->player_x, prog->player_y))
-	// 	exit (0);
-	// while (layout[i])
-	// {
-	// 	l = 0;
-	// 	if (ft_strlen(layout[0]) != ft_strlen(layout[i]))
-	// 		error_msg(1);
-	// 	while (layout[i][l])
-	// 	{
-	// 		check_map_lines(layout, map, i, l);
-	// 		l++;
-	// 	}
-	// 	i++;
-	// }
-	// if ((*map).ex != 1 || (*map).st != 1 || (*map).col < 1)
-	// 	error_msg(3);
-	// if (!check_path(*map))
-	// 	error_msg(4);
+void	check_corr_symbols2(char **la, int i, int l, t_check_info info)
+{
+	if (la[i][l] != '1' && la[i][l] != ' ')
+	{
+		if (i == 0 || l == 0 || i == info.max_i || l == info.max_l[i] - 1
+			|| l >= info.max_l[i - 1] - 1 || l >= info.max_l[i + 1] - 1
+			|| la[i + 1][l] == ' ' || la[i - 1][l] == ' '
+			|| la[i][l + 1] == ' ' || la[i][l - 1] == ' ')
+			error_msg("Map not enclosed by walls or spaces in map.");
+		if (la[i][l] == 'D')
+		{
+			if (la[i + 1][l] != '1' || la[i - 1][l] != '1')
+			{
+				if (la[i][l + 1] != '1' || la[i][l - 1] != '1')
+					error_msg("Incorrect door placement.");
+			}
+		}
+	}
+}
+
+void	check_corr_symbols(char **la, int max_i, int *max_l, t_check_info info)
+{
+	int	i;
+	int	l;
+
+	i = -1;
+	while (la[++i])
+	{
+		l = -1;
+		while (la[i][++l])
+		{
+			if (la[i][l] != '0' && la[i][l] != 'N' && la[i][l] != 'S'
+				&& la[i][l] != 'E' && la[i][l] != 'W' && la[i][l] != 'C'
+				&& la[i][l] != 'D' && la[i][l] != ' ' && la[i][l] != '1')
+			{
+				error_msg("Incorrect symbols in map.");
+			}
+			check_corr_symbols2(la, i, l, info);
+		}
+	}
+}
+
+void	set_start_values2(t_prog *p, double vec_x, double vec_y, double plane_x)
+{
+	p->dir_vec_x = vec_x;
+	p->dir_vec_y = vec_y;
+	p->plane_x = plane_x;
+}
+
+void	set_start_values(char symbol, int i, int l, t_prog *prog)
+{
+	prog->player_y = l;
+	prog->player_x = i;
+	if (symbol == 'S')
+	{
+		set_start_values2(prog, 0.996673, 0.081502, 0.053791);
+		prog->plane_y = -0.657804;
+	}
+	if (symbol == 'N')
+	{
+		set_start_values2(prog, -1, 0, 0);
+		prog->plane_y = 0.66;
+	}
+	if (symbol == 'W')
+	{
+		set_start_values2(prog, 0.108987, -0.994043, -0.656068);
+		prog->plane_y = -0.071931;
+	}
+	if (symbol == 'E')
+	{
+		set_start_values2(prog, 0.019202, -0.999816, -0.659878);
+		prog->plane_y = -0.012674;
+	}
+}
+
+void	set_max_l(int **max_l, char **la, int l, int i)
+{
+	*max_l = malloc(sizeof(int) * i + 1);
+	i = -1;
+	while (la[++i])
+	{
+		l = 0;
+		while (la[i][l])
+			l++;
+		(*max_l)[i] = l;
+	}
+}
+
+void	check_map_req(char **la, t_map *map, t_prog *prog)
+{
+	t_check_info	info;
+
+	info.check = 0;
+	info.i = -1;
+	while (la[++info.i])
+	{
+		info.l = -1;
+		while (la[info.i][++info.l])
+		{
+			if (la[info.i][info.l] == 'N' || la[info.i][info.l] == 'S'
+				|| la[info.i][info.l] == 'E' || la[info.i][info.l] == 'W')
+			{
+				set_start_values(la[info.i][info.l], info.i, info.l, prog);
+				if (info.check == 1)
+					error_msg("Multiple spawn points.");
+				info.check++;
+			}
+		}
+	}
+	if (info.check == 0)
+		error_msg("No spawn point.");
+	info.max_i = info.i;
+	set_max_l(&(info.max_l), la, info.l, info.i);
+	check_corr_symbols(la, info.max_i, info.max_l, info);
 }
 
 char	*ft_charjoin(char *s1, char s2)
@@ -241,8 +228,8 @@ char	*ft_charjoin(char *s1, char s2)
 		res[i] = s1[i];
 		i++;
 	}
-		res[i] = s2;
-		i++;
+	res[i] = s2;
+	i++;
 	res[i] = '\0';
 	free (s1);
 	return (res);
@@ -264,6 +251,7 @@ char	*get_value_texture(char *line)
 	}
 	return (value);
 }
+
 void	get_value_color_c(char *line, t_map *map)
 {
 	int	i;
@@ -339,6 +327,18 @@ int	check_value(char *line, t_map *map)
 	return (1);
 }
 
+void	get_map_info2(char **line, t_map *map1, int *fd, int *checker)
+{
+	*checker = 0;
+	*line = get_next_line(*fd);
+	while (*line != NULL && *checker < 6)
+	{
+		*checker += check_value(*line, map1);
+		free(*line);
+		*line = get_next_line(*fd);
+	}
+}
+
 t_map	get_map_info(char *map_file, t_prog *prog)
 {
 	t_map	map1;
@@ -347,31 +347,20 @@ t_map	get_map_info(char *map_file, t_prog *prog)
 	char	*layout;
 	char	*line;
 
-	checker = 0;
 	fd = open(map_file, O_RDONLY);
 	layout = ft_strdup_gnl("");
-	line = get_next_line(fd);
-	
-	while (line != NULL && checker < 6)
-	{
-		checker += check_value(line, &map1);
-		free(line);
-		line = get_next_line(fd);
-	}
+	get_map_info2(&line, &map1, &fd, &checker);
 	while (line != NULL)
 	{
 		layout = ft_strjoin_gnl(layout, line);
 		free(line);
 		line = get_next_line(fd);
 	}
-	if (!layout)
-		exit(0);
 	map1.layout = ft_split(layout, '\n');
 	if (!map1.layout[0])
-		exit(0);
+		error_msg("No map provided.");
 	map1.layouttest = ft_split(layout, '\n');
 	check_map_req(map1.layout, &map1, prog);
-	// free_chars(&layout, &line);
 	close(fd);
 	return (map1);
 }
