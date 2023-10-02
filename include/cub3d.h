@@ -1,10 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cub3d.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ehasalu <ehasalu@42prague.com>             +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/10/02 23:18:24 by ehasalu           #+#    #+#             */
+/*   Updated: 2023/10/03 00:00:57 by ehasalu          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef CUB3D_H
 # define CUB3D_H
 
 # include <math.h>
 # include <stdio.h>
 # include "../libft/libft.h"
-# include "../MLX42//include/MLX42/MLX42.h"
+# include "../MLX42/include/MLX42/MLX42.h"
 # include <stdlib.h>
 # include <fcntl.h>
 # include <string.h>
@@ -216,7 +228,8 @@ void		error_msg(char *msg);
 void		map_test(char **la, int m[], int n);
 void		check_corr_symbols2(char **la, int i, int l, t_check_info info);
 void		check_corr_symbols(char **la, t_check_info info);
-void	set_start_values2(t_prog *p, double vec_x, double vec_y, double plane_x);
+void		set_start_values2(t_prog *p,
+				double vec_x, double vec_y, double plane_x);
 
 //minimap
 void		mini_cast_render(t_prog *prog);
