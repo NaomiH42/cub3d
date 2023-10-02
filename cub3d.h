@@ -16,9 +16,11 @@
 # define F 5
 # define C 6
 # define N 90
-# define u_div 1
-# define v_div 1
-# define v_move 0.0
+# define U_DIV 1
+# define V_DIV 1
+# define V_MOVE 0.0
+# define TEX_H 64
+# define TEX_W 64
 
 typedef struct s_coor
 {
@@ -35,23 +37,23 @@ typedef struct s_map
 	char	*so_t;
 	char	*we_t;
 	char	*ea_t;
-	int		FR;
-	int		FG;
-	int		FB;
-	int		CR;
-	int		CG;
-	int		CB;
+	int		fr;
+	int		fg;
+	int		fb;
+	int		cr;
+	int		cg;
+	int		cb;
 }	t_map;
 
 typedef struct m_sprite
 {
-	int		x;
-	int		y;
+	int			x;
+	int			y;
 	mlx_image_t	*tex;
-	mlx_image_t *tex2;
+	mlx_image_t	*tex2;
 }				t_sprite;
 
-typedef struct	m_prog
+typedef struct m_prog
 {
 	void		*win;
 	int			screen_w;
@@ -66,18 +68,18 @@ typedef struct	m_prog
 	double		plane_y;
 	double		time;
 	double		old_time;
-	mlx_image_t *test;;
+	mlx_image_t	*test;
 	t_map		map;
-	mlx_image_t	 *nw;
-	mlx_image_t *sw;
-	mlx_image_t *ew;
-	mlx_image_t *ww;
-	mlx_image_t *mini;
+	mlx_image_t	*nw;
+	mlx_image_t	*sw;
+	mlx_image_t	*ew;
+	mlx_image_t	*ww;
+	mlx_image_t	*mini;
 	int			mini_x;
 	int			mini_y;
 	int			mini_width;
 	int			mini_height;
-	double 		z_buffer[640];
+	double		z_buffer[640];
 	t_sprite	sprites[1];
 	mlx_image_t	*door;
 	int			frame;
@@ -85,7 +87,13 @@ typedef struct	m_prog
 	int			door_y;
 }				t_prog;
 
-typedef struct	m_check_info
+typedef struct m_ray
+{
+	double	x;
+	double	y;
+}				t_ray;
+
+typedef struct m_check_info
 {
 	int	i;
 	int	l;
@@ -94,36 +102,36 @@ typedef struct	m_check_info
 	int	*max_l;
 }				t_check_info;
 
-typedef struct	m_render_info
+typedef struct m_render_info
 {
-	int	ray_count;
-	int tex_x;
-	int	i;
-	double	wall_x;
-	double	step;
-	double	tex_pos;
-	int		tex_y;
-	double	sprite_x;
-	double	sprite_y;
-	double	inv_det;
-	double	transform_x;
-	double	transform_y;
-	int		v_move_screen;
-	int		sprite_screen_x;
-	int		sprite_height;
-	int		draw_start_y;
-	int		draw_end_y;
-	int		draw_end_x;
-	int		draw_start_x;
-	int		sprite_width;
-	int		sprite;
-	int		stripe;
-	int		y;
-	int		d;
+	int			ray_count;
+	int			tex_x;
+	int			i;
+	double		wall_x;
+	double		step;
+	double		tex_pos;
+	int			tex_y;
+	double		sprite_x;
+	double		sprite_y;
+	double		inv_det;
+	double		transform_x;
+	double		tr_y;
+	int			v_ms;
+	int			sp_sx;
+	int			sp_h;
+	int			draw_start_y;
+	int			draw_end_y;
+	int			draw_end_x;
+	int			draw_start_x;
+	int			sp_w;
+	int			sprite;
+	int			str;
+	int			y;
+	int			d;
 	uint32_t	tex_col;
 }				t_render_info;
 
-typedef struct	m_main_info
+typedef struct m_main_info
 {
 	int	j;
 	int	i;
@@ -131,7 +139,7 @@ typedef struct	m_main_info
 	int	d;
 }				t_main_info;
 
-typedef struct	m_cast_info
+typedef struct m_cast_info
 {
 	double	camera;
 	int		map_x;
@@ -148,6 +156,7 @@ typedef struct	m_cast_info
 	int		line_height;
 	int		draw_start;
 	int		draw_end;
+
 }				t_cast_info;
 
 t_map	get_map_info(char *map_file, t_prog *prog);

@@ -9,7 +9,7 @@ CFLAGS = -Wall -Werror -Wextra
 all: $(NAME)
 
 $(NAME): $(SRCS)
-	$(CC) $(SRCS) libmlx42.a libft.a -Iinclude -ldl -lglfw -pthread -lm -g -o $(NAME)
+	$(CC) $(CFLAGS) $(SRCS) libmlx42.a libft.a -Iinclude -ldl -lglfw -pthread -lm -g -o $(NAME)
 
 bonus: all
 

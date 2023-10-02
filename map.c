@@ -70,7 +70,7 @@ void	error_msg(char *msg)
 // 		error_msg(5);
 // }
 
-int	map_test(char **la, int m[], int n)
+void	map_test(char **la, int m[], int n)
 {
 	int	i;
 	int	l;
@@ -117,7 +117,7 @@ void	check_corr_symbols2(char **la, int i, int l, t_check_info info)
 	}
 }
 
-void	check_corr_symbols(char **la, int max_i, int *max_l, t_check_info info)
+void	check_corr_symbols(char **la, t_check_info info)
 {
 	int	i;
 	int	l;
@@ -185,7 +185,7 @@ void	set_max_l(int **max_l, char **la, int l, int i)
 	}
 }
 
-void	check_map_req(char **la, t_map *map, t_prog *prog)
+void	check_map_req(char **la, t_prog *prog)
 {
 	t_check_info	info;
 
@@ -210,7 +210,8 @@ void	check_map_req(char **la, t_map *map, t_prog *prog)
 		error_msg("No spawn point.");
 	info.max_i = info.i;
 	set_max_l(&(info.max_l), la, info.l, info.i);
-	check_corr_symbols(la, info.max_i, info.max_l, info);
+	check_corr_symbols(la, info);
+	free(info.max_l);
 }
 
 char	*ft_charjoin(char *s1, char s2)
@@ -271,11 +272,11 @@ void	get_value_color_c(char *line, t_map *map)
 			i++;
 		}
 		if (rgb == 0)
-			map->CR = color;
+			map->cr = color;
 		else if (rgb == 1)
-			map->CG = color;
+			map->cg = color;
 		else if (rgb == 2)
-			map->CB = color;
+			map->cb = color;
 		rgb++;
 	}
 }
@@ -299,11 +300,11 @@ void	get_value_color_f(char *line, t_map *map)
 			i++;
 		}
 		if (rgb == 0)
-			map->FR = color;
+			map->fr = color;
 		else if (rgb == 1)
-			map->FG = color;
+			map->fg = color;
 		else if (rgb == 2)
-			map->FB = color;
+			map->fb = color;
 		rgb++;
 	}
 }
@@ -357,10 +358,10 @@ t_map	get_map_info(char *map_file, t_prog *prog)
 		line = get_next_line(fd);
 	}
 	map1.layout = ft_split(layout, '\n');
+	free(layout);
 	if (!map1.layout[0])
 		error_msg("No map provided.");
-	map1.layouttest = ft_split(layout, '\n');
-	check_map_req(map1.layout, &map1, prog);
+	check_map_req(map1.layout, prog);
 	close(fd);
 	return (map1);
 }
