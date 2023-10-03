@@ -6,7 +6,7 @@
 /*   By: ehasalu <ehasalu@42prague.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 21:46:58 by ehasalu           #+#    #+#             */
-/*   Updated: 2023/10/02 23:36:42 by ehasalu          ###   ########.fr       */
+/*   Updated: 2023/10/03 11:33:54 by ehasalu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,6 @@ int	main(int argc, char **argv)
 	prepare_map(&prog, &info.i, &info.j);
 	prepare_mini(&prog, info.i, info.j);
 	draw_mini(&info, &prog);
-	printf("r%d g%d b%d\n", prog.map.cr, prog.map.cg, prog.map.cb);
-	printf("%d", rgb_to_argb(prog.map.cr, prog.map.cg, prog.map.cb));
 	load_sprites(&prog);
 	mlx_image_to_window(prog.win, prog.mini, 0, 0);
 	load_walls(&prog);

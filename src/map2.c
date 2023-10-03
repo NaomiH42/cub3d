@@ -6,7 +6,7 @@
 /*   By: ehasalu <ehasalu@42prague.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 21:46:58 by ehasalu           #+#    #+#             */
-/*   Updated: 2023/10/02 23:36:42 by ehasalu          ###   ########.fr       */
+/*   Updated: 2023/10/03 11:33:34 by ehasalu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 void	set_start_values(char symbol, int i, int l, t_prog *prog)
 {
-	prog->player_y = l;
-	prog->player_x = i;
+	prog->player_y = l + 0.1;
+	prog->player_x = i + 0.1;
 	if (symbol == 'S')
 	{
 		set_start_values2(prog, 0.996673, 0.081502, 0.053791);
