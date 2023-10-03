@@ -7,7 +7,7 @@ OBJS_DIR := ./obj/
 LIB_DIR := ./libs/
 
 SRC := 	main.c map.c map2.c map3.c casting.c controls.c controls2.c controls3_n_stuff.c drawing.c \
-		minimap.c prep_prog.c raying.c
+		minimap.c prep_prog.c raying.c colors.c
 
 INCLUDE := ./include/
 

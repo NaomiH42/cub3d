@@ -6,7 +6,7 @@
 /*   By: ehasalu <ehasalu@42prague.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 23:18:24 by ehasalu           #+#    #+#             */
-/*   Updated: 2023/10/03 00:00:57 by ehasalu          ###   ########.fr       */
+/*   Updated: 2023/10/03 12:16:26 by ehasalu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,7 +195,7 @@ void		hook(void *parameter);
 
 //controls3
 double		deg_to_rad(int degrees);
-int			rgb_to_argb(int r, int g, int b);
+int			rgb_to_argb(int r, int g, int b, int a);
 void		move_forwards(t_prog *prog);
 void		move_backwards(t_prog *prog);
 
@@ -252,5 +252,13 @@ void		assign_dir(t_cast_info *info, t_prog *prog);
 void		cast_texture(t_cast_info *info, t_render_info *f, t_prog *prog,
 				t_ray *ray);
 void		ray_casting2(t_prog *prog);
+
+//colors
+
+int			get_r(int rgba);
+int			get_g(int rgba);
+int			get_b(int rgba);
+int			get_a(int rgba);
+int			correct_color(uint32_t px);
 
 #endif

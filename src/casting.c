@@ -6,7 +6,7 @@
 /*   By: ehasalu <ehasalu@42prague.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 21:46:35 by ehasalu           #+#    #+#             */
-/*   Updated: 2023/10/03 11:54:43 by ehasalu          ###   ########.fr       */
+/*   Updated: 2023/10/03 12:16:14 by ehasalu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ void	sprite_cast3(t_prog *prog, t_render_info *f)
 	f->tex_y = ((f->d * 64) / f->sp_h) / 256;
 	f->tex_col = put_pixel_color(prog->sprites[0].tex,
 			f->tex_x, f->tex_y);
+	f->tex_col = correct_color(f->tex_col);
 	if ((f->tex_col & 0x00FFFFFF) != 0)
 		mlx_put_pixel(prog->test, f->str, f->y, f->tex_col);
 }
@@ -85,6 +86,7 @@ void	sprite_cast(t_prog *prog, t_render_info *f)
 	}
 }
 
+
 void	texture_cast(t_prog *prog, t_cast_info *info, t_render_info *f)
 {
 	f->y = info->draw_start - 1;
@@ -102,13 +104,12 @@ void	texture_cast(t_prog *prog, t_cast_info *info, t_render_info *f)
 			f->tex_col = put_pixel_color(prog->sw, f->tex_x, f->tex_y);
 		else
 			f->tex_col = put_pixel_color(prog->ww, f->tex_x, f->tex_y);
-		// printf("%d\n", f->tex_col);
-		// f->tex_col = - f->tex_col;
+		f->tex_col = correct_color(f->tex_col);
 		mlx_put_pixel(prog->test, f->ray_count, f->y, f->tex_col);
 	}
 	draw_line1(prog->test, f->ray_count, info->draw_start,
-		rgb_to_argb(prog->map.cr, prog->map.cg, prog->map.cb));
+		rgb_to_argb(prog->map.cr, prog->map.cg, prog->map.cb, 255));
 	draw_line2(prog->test, f->ray_count, info->draw_end,
-		rgb_to_argb(prog->map.fr, prog->map.fg, prog->map.fb));
+		rgb_to_argb(prog->map.fr, prog->map.fg, prog->map.fb, 255));
 	prog->z_buffer[f->ray_count] = info->wall_dist;
 }

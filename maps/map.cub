@@ -1,13 +1,13 @@
-NO ./pics/wall6.png
-SO    ./pics/wall1.png
+NO ./pics/wall1.png
+SO    ./pics/wall5.png
 
-EA ./pics/wall3.png
+EA ./pics/wall9.png
 
 F 0,  0,255
 C 225,0,0
 
 
-WE ./pics/wall4.png
+WE ./pics/wall13.png
 
         1111111111111111111111111
         1000000000110000000000001
