@@ -6,7 +6,7 @@
 /*   By: ehasalu <ehasalu@42prague.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 21:46:35 by ehasalu           #+#    #+#             */
-/*   Updated: 2023/10/02 23:36:42 by ehasalu          ###   ########.fr       */
+/*   Updated: 2023/10/03 11:54:43 by ehasalu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,8 @@ void	texture_cast(t_prog *prog, t_cast_info *info, t_render_info *f)
 			f->tex_col = put_pixel_color(prog->sw, f->tex_x, f->tex_y);
 		else
 			f->tex_col = put_pixel_color(prog->ww, f->tex_x, f->tex_y);
+		// printf("%d\n", f->tex_col);
+		// f->tex_col = - f->tex_col;
 		mlx_put_pixel(prog->test, f->ray_count, f->y, f->tex_col);
 	}
 	draw_line1(prog->test, f->ray_count, info->draw_start,

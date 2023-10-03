@@ -1,13 +1,13 @@
-NO ./pics/greystone.png
-SO    ./pics/redbrick.png
+NO ./pics/wall6.png
+SO    ./pics/wall1.png
 
-EA ./pics/pillar.png
+EA ./pics/wall3.png
 
 F 0,  0,255
 C 225,0,0
 
 
-WE ./pics/eagle.png
+WE ./pics/wall4.png
 
         1111111111111111111111111
         1000000000110000000000001

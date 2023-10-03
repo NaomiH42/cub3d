@@ -6,7 +6,7 @@
 /*   By: ehasalu <ehasalu@42prague.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 21:46:58 by ehasalu           #+#    #+#             */
-/*   Updated: 2023/10/02 23:36:42 by ehasalu          ###   ########.fr       */
+/*   Updated: 2023/10/03 11:47:31 by ehasalu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void	load_sprites(t_prog *prog)
 		exit(0);
 	prog->sprites[0].tex = mlx_texture_to_image(prog->win, bar);
 	prog->sprites[0].tex2 = mlx_texture_to_image(prog->win, bar2);
-	door = mlx_load_png("./pics/door1.png");
+	door = mlx_load_png("./pics/door.png");
 	if (!door)
 		exit(0);
 	prog->door = mlx_texture_to_image(prog->win, door);
