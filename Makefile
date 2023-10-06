@@ -18,7 +18,7 @@ LIBFT := $(LIB_DIR)libft.a
 LIBMLX := $(LIB_DIR)libmlx42.a
 
 
-CFLAGS := -Wall -Werror -Wextra
+CFLAGS := -Wall -Werror -Wextra -g
 
 all: $(NAME)
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ehasalu <ehasalu@42prague.com>             +#+  +:+       +#+        */
+/*   By: ehasalu <ehasalu@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 21:46:58 by ehasalu           #+#    #+#             */
-/*   Updated: 2023/10/03 11:46:53 by ehasalu          ###   ########.fr       */
+/*   Updated: 2023/10/06 16:04:34 by ehasalu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,20 @@ void	change_sprite(t_prog *prog)
 	prog->sprites[0].tex2 = temp;
 }
 
+int	correct_map(char *map)
+{
+	int i;
+
+	i = 0;
+	while (map[i])
+		i++;
+	while (i > 0 && map[i] != '.')
+		i--;
+	if (!ft_strncmp(&map[i], ".cub", 4))
+		return (1);
+	return (0);
+}
+
 int	main(int argc, char **argv)
 {
 	t_prog		prog;
@@ -51,6 +65,8 @@ int	main(int argc, char **argv)
 
 	if (argc != 2)
 		error_msg("Incorrect number of arguments.");
+	if (!correct_map(argv[1]))
+		return (ft_putstr_fd("INCORRECRET MAP FORMAT\n", 2), 0);
 	prog_init(&prog, argv[1]);
 	prepare_map(&prog, &info.i, &info.j);
 	prepare_mini(&prog, info.i, info.j);

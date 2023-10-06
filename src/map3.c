@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map3.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ehasalu <ehasalu@42prague.com>             +#+  +:+       +#+        */
+/*   By: ehasalu <ehasalu@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 21:46:58 by ehasalu           #+#    #+#             */
-/*   Updated: 2023/10/02 23:36:42 by ehasalu          ###   ########.fr       */
+/*   Updated: 2023/10/06 16:11:38 by ehasalu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ void	map_test(char **la, int m[], int n)
 
 void	check_corr_symbols2(char **la, int i, int l, t_check_info info)
 {
+	info.max_i -= 1;
 	if (la[i][l] != '1' && la[i][l] != ' ')
 	{
 		if (i == 0 || l == 0 || i == info.max_i || l == info.max_l[i] - 1
